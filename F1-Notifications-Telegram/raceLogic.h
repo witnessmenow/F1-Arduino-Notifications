@@ -7,6 +7,11 @@ const char *racesJson =
 time_t nextRaceStartUtc;
 
 Timezone myTZ;
+F1Config rl_f1Config;
+
+void raceLogicSetup(F1Config f1Config){
+  rl_f1Config = f1Config;
+}
 
 String getConvertedTime(const char* sessionStartTime) {
   struct tm tm = {0};
@@ -14,7 +19,7 @@ String getConvertedTime(const char* sessionStartTime) {
   strptime(sessionStartTime, "%Y-%m-%dT%H:%M:%S", &tm);
   time_t sessionEpoch = mktime(&tm);
 
-  return myTZ.dateTime(sessionEpoch, UTC_TIME, timeFormat);
+  return myTZ.dateTime(sessionEpoch, UTC_TIME, rl_f1Config.timeFormat);
 }
 
 void printConvertedTime(const char* sessionName, const char* sessionStartTime) {
@@ -111,14 +116,28 @@ bool sendNotificationOfNextRace(UniversalTelegramBot *bot, int offset) {
 
 
   printRaceTimes(races_name, races_sessions);
-  return bot->sendMessage(chatId, createTelegramMessageString(races_name, races_sessions), "");
+
+  Serial.print("Sending message to ");
+  Serial.println(rl_f1Config.chatId);
+  
+  return bot->sendPhoto(rl_f1Config.chatId, "https://i.imgur.com/q3qsfSi.png", createTelegramMessageString(races_name, races_sessions));
+  
 }
 
 bool getNextRace(int &offset, bool &notificationSent) {
 
+  StaticJsonDocument<112> filter;
+
+  JsonObject filter_races_0 = filter["races"].createNestedObject();
+  filter_races_0["name"] = true;
+  filter_races_0["location"] = true;
+  filter_races_0["round"] = true;
+  filter_races_0["circuitImage"] = true;
+  filter_races_0["sessions"] = true;
+
   DynamicJsonDocument doc(12288);
 
-  DeserializationError error = deserializeJson(doc, racesJson);
+  DeserializationError error = deserializeJson(doc, racesJson, DeserializationOption::Filter(filter));
 
   if (error) {
     Serial.print("deserializeJson() failed: ");
@@ -166,8 +185,7 @@ bool getNextRace(int &offset, bool &notificationSent) {
 
 time_t getNotifyTime() {
 
-  time_t t = nextRaceStartUtc - (3*SECS_PER_DAY);
+  time_t t = nextRaceStartUtc - (6 * SECS_PER_DAY);
   // Probably should make this smarter so it's not sending notifications in the middle of the night!
   return t;
 }
-
