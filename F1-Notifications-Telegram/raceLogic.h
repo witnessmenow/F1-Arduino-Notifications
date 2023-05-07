@@ -1,11 +1,9 @@
 #ifndef RACELOGIC_H
 #define RACELOGIC_H
 
-// races.h is a file made up of this JSON file from F1Calendar.com
-// https://github.com/sportstimes/f1/blob/main/_db/f1/2023.json
-const char *racesJson =
-#include "races.h"
-  ;
+#define RACE_FILE_NAME "/races.json"
+
+#define RACE_JSON_URL "https://raw.githubusercontent.com/sportstimes/f1/main/_db/f1/2023.json"
 
 time_t nextRaceStartUtc;
 
@@ -54,6 +52,9 @@ const char* sessionCodeToString(const char* sessionCode) {
   } else if (strcmp(sessionCode, "sprint") == 0)
   {
     return "Sprint: ";
+  } else if (strcmp(sessionCode, "sprintQualifying") == 0)
+  {
+    return "Sprint Qualifying: ";
   } else if (strcmp(sessionCode, "gp") == 0)
   {
     return "Race: ";
@@ -85,54 +86,29 @@ String createTelegramMessageString(const char* raceName, JsonObject races_sessio
     message += getConvertedTime(kv.value().as<const char*>(), "");
     message += "\n";
   }
-
-  //  message += "FP1: ";
-  //  message += getConvertedTime(races_sessions["fp1"].as<const char*>(), "");
-  //  message += "\n";
-  //
-  //  if (races_sessions.containsKey("sprint")) {
-  //    //Is a sprint Weekend, order is different
-  //    message += "Qualifying: ";
-  //    message += getConvertedTime(races_sessions["qualifying"].as<const char*>(), "");
-  //    message += "\n";
-  //
-  //    message += "FP2: ";
-  //    message += getConvertedTime(races_sessions["fp2"].as<const char*>(), "");
-  //    message += "\n";
-  //
-  //    message += "Sprint: ";
-  //    message += getConvertedTime(races_sessions["sprint"].as<const char*>(), "");
-  //    message += "\n";
-  //
-  //  } else {
-  //    message += "FP2: ";
-  //    message += getConvertedTime(races_sessions["fp2"].as<const char*>(), "");
-  //    message += "\n";
-  //
-  //    message += "FP3: ";
-  //    message += getConvertedTime(races_sessions["fp3"].as<const char*>(), "");
-  //    message += "\n";
-  //
-  //    message += "Qualifying: ";
-  //    message += getConvertedTime(races_sessions["qualifying"].as<const char*>(), "");
-  //    message += "\n";
-  //
-  //  }
-  //
-  //  message += "Race: ";
-  //  message += getConvertedTime(races_sessions["gp"].as<const char*>(), "");
-  //  message += "\n";
   return message;
 }
 
 bool sendNotificationOfNextRace(UniversalTelegramBot *bot, int offset) {
+
+  StaticJsonDocument<112> filter;
+
+  JsonObject filter_races_0 = filter["races"].createNestedObject();
+  filter_races_0["name"] = true;
+  filter_races_0["location"] = true;
+  filter_races_0["round"] = true;
+  filter_races_0["circuitImage"] = true;
+  filter_races_0["sessions"] = true;
+
+  File racesJson = SPIFFS.open(RACE_FILE_NAME);
   DynamicJsonDocument doc(12288);
 
-  DeserializationError error = deserializeJson(doc, racesJson);
+  DeserializationError error = deserializeJson(doc, racesJson, DeserializationOption::Filter(filter));
 
   if (error) {
     Serial.print("deserializeJson() failed: ");
     Serial.println(error.c_str());
+    racesJson.close();
     return false;
   }
   JsonArray races = doc["races"];
@@ -147,9 +123,33 @@ bool sendNotificationOfNextRace(UniversalTelegramBot *bot, int offset) {
 
   Serial.print("Sending message to ");
   Serial.println(rl_f1Config.chatId);
-
+  racesJson.close();
   return bot->sendPhoto(rl_f1Config.chatId, "https://i.imgur.com/q3qsfSi.png", createTelegramMessageString(races_name, races_sessions));
 
+}
+
+int fetchRaceJson(FileFetcher fileFetcher) {
+  // In this example I reuse the same filename
+  // over and over
+  if (SPIFFS.exists(RACE_FILE_NAME) == true)
+  {
+    Serial.println("Removing existing image");
+    SPIFFS.remove(RACE_FILE_NAME);
+  }
+
+  fs::File f = SPIFFS.open(RACE_FILE_NAME, "w+");
+  if (!f)
+  {
+    Serial.println("file open failed");
+    return -1;
+  }
+
+  bool gotFile = fileFetcher.getFile(RACE_JSON_URL, &f);
+
+  // Make sure to close the file!
+  f.close();
+
+  return gotFile;
 }
 
 bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display) {
@@ -163,6 +163,7 @@ bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display) {
   filter_races_0["circuitImage"] = true;
   filter_races_0["sessions"] = true;
 
+  File racesJson = SPIFFS.open(RACE_FILE_NAME);
   DynamicJsonDocument doc(12288);
 
   DeserializationError error = deserializeJson(doc, racesJson, DeserializationOption::Filter(filter));
@@ -203,11 +204,12 @@ bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display) {
       }
       f1Display->printRaceToScreen(races_name, races_sessions);
       printRaceTimes(races_name, races_sessions);
+      racesJson.close();
       return newRace;
     }
 
   }
-
+  racesJson.close();
   return false;
 
 }

@@ -13,6 +13,9 @@
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
 
+//#define YELLOW_DISPLAY
+#define MATRIX_DISPLAY
+
 
 // ----------------------------
 // Library Defines - Need to be defined before library import
@@ -66,9 +69,17 @@
 // Search for "Universal Telegram" in the Arduino Library manager
 // https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot
 
+#include <FileFetcher.h>
+// Library used to get files or images
+
+// Not on library manager yet
+// https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot
+
 // ----------------------------
 // Internal includes
 // ----------------------------
+
+#include "githubCert.h"
 
 #include "display.h"
 
@@ -82,19 +93,28 @@
 // Display Choice
 // ----------------------------
 
-//#include "cheapYellowLCD.h"
+#if defined YELLOW_DISPLAY
+
+#include "cheapYellowLCD.h"
+CheapYellowDisplay cyd;
+F1Display* f1Display = &cyd;
+
+#elif defined MATRIX_DISPLAY
+
 #include "matrixDisplay.h"
+MatrixDisplay matrixDisplay;
+F1Display* f1Display = &matrixDisplay;
+
+#endif
+// ----------------------------
 
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot("", secured_client);
 
 F1Config f1Config;
 
-//F1Display* f1Display;
-//CheapYellowDisplay cyd;
-//F1Display* f1Display = &cyd;
-MatrixDisplay matrixDisplay;
-F1Display* f1Display = &matrixDisplay;
+
+FileFetcher fileFetcher(secured_client);
 
 void setup() {
   // put your setup code here, to run once:
@@ -149,6 +169,16 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
+  secured_client.setCACert(github_server_cert);
+  while (fetchRaceJson(fileFetcher) != 1) {
+    Serial.println("failed to get Race Json");
+    Serial.println("will try again in 10 seconds");
+    delay(1000 * 10);
+  }
+
+  Serial.println("Fetched races.json File");
+
+
   Serial.println("Waiting for time sync");
 
   waitForSync();
@@ -183,9 +213,12 @@ void sendNotification() {
 
 bool first = true;
 
+int minuteCounter = 0;
+
 void loop() {
   drd->loop();
   if (first || minuteChanged()) {
+    minuteCounter ++;
     first = false;
     bool newRace = getNextRace(f1Config.roundOffset, f1Config.currentRaceNotification, f1Display);
     if (newRace) {
@@ -197,6 +230,16 @@ void loop() {
       Serial.print("Raised event for: ");
       Serial.println(myTZ.dateTime(getNotifyTime(), UTC_TIME, f1Config.timeFormat));
     }
+  }
+
+  if (minuteCounter >= 60) {
+    secured_client.setCACert(github_server_cert);
+    while (fetchRaceJson(fileFetcher) != 1) {
+      Serial.println("failed to get Race Json");
+      Serial.println("will try again in 10 seconds");
+      delay(1000 * 10);
+    }
+    minuteCounter = 0;
   }
   events();
 }

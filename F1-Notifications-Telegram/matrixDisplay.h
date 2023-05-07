@@ -122,6 +122,9 @@ class MatrixDisplay: public F1Display {
       } else if (strcmp(sessionCode, "qualifying") == 0)
       {
         return "Qual:";
+      } else if (strcmp(sessionCode, "sprintQualifying") == 0)
+      {
+        return "Sp Q:";
       } else if (strcmp(sessionCode, "sprint") == 0)
       {
         return "Spr:";
