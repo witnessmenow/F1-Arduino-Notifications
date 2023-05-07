@@ -70,21 +70,38 @@
 // Internal includes
 // ----------------------------
 
+#include "display.h"
+
 #include "config.h"
 
 #include "raceLogic.h"
 
 #include "wifiManager.h"
 
+// ----------------------------
+// Display Choice
+// ----------------------------
+
+//#include "cheapYellowLCD.h"
+#include "matrixDisplay.h"
+
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot("", secured_client);
 
 F1Config f1Config;
 
+//F1Display* f1Display;
+//CheapYellowDisplay cyd;
+//F1Display* f1Display = &cyd;
+MatrixDisplay matrixDisplay;
+F1Display* f1Display = &matrixDisplay;
+
 void setup() {
   // put your setup code here, to run once:
 
   Serial.begin(115200);
+
+  f1Display->displaySetup();
 
   bool forceConfig = false;
 
@@ -170,7 +187,7 @@ void loop() {
   drd->loop();
   if (first || minuteChanged()) {
     first = false;
-    bool newRace = getNextRace(f1Config.roundOffset, f1Config.currentRaceNotification);
+    bool newRace = getNextRace(f1Config.roundOffset, f1Config.currentRaceNotification, f1Display);
     if (newRace) {
       f1Config.saveConfigFile();
     }

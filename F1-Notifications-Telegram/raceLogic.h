@@ -1,3 +1,6 @@
+#ifndef RACELOGIC_H
+#define RACELOGIC_H
+
 // races.h is a file made up of this JSON file from F1Calendar.com
 // https://github.com/sportstimes/f1/blob/main/_db/f1/2023.json
 const char *racesJson =
@@ -9,46 +12,64 @@ time_t nextRaceStartUtc;
 Timezone myTZ;
 F1Config rl_f1Config;
 
-void raceLogicSetup(F1Config f1Config){
+void raceLogicSetup(F1Config f1Config) {
   rl_f1Config = f1Config;
 }
 
-String getConvertedTime(const char* sessionStartTime) {
+String getConvertedTime(const char* sessionStartTime, const char* timeFormat = "") {
   struct tm tm = {0};
   // Parse date from UTC and convert to an epoch
   strptime(sessionStartTime, "%Y-%m-%dT%H:%M:%S", &tm);
   time_t sessionEpoch = mktime(&tm);
 
-  return myTZ.dateTime(sessionEpoch, UTC_TIME, rl_f1Config.timeFormat);
+  String timeFormatStr = rl_f1Config.timeFormat;
+  if (timeFormat[0] != 0) {
+    timeFormatStr = String(timeFormat);
+  }
+  return myTZ.dateTime(sessionEpoch, UTC_TIME, timeFormatStr);
 }
 
 void printConvertedTime(const char* sessionName, const char* sessionStartTime) {
 
-  String timeStr = getConvertedTime(sessionStartTime);
+  String timeStr = getConvertedTime(sessionStartTime, "");
   Serial.print(sessionName);
   Serial.print(": ");
   Serial.println(timeStr);
 
 }
 
+const char* sessionCodeToString(const char* sessionCode) {
+  if (strcmp(sessionCode, "fp1") == 0)
+  {
+    return "FP1: ";
+  } else if (strcmp(sessionCode, "fp2") == 0)
+  {
+    return "FP2: ";
+  } else if (strcmp(sessionCode, "fp3") == 0)
+  {
+    return "FP3: ";
+  } else if (strcmp(sessionCode, "qualifying") == 0)
+  {
+    return "Qualifying: ";
+  } else if (strcmp(sessionCode, "sprint") == 0)
+  {
+    return "Sprint: ";
+  } else if (strcmp(sessionCode, "gp") == 0)
+  {
+    return "Race: ";
+  }
+
+  return "UNKNOWN";
+}
+
 void printRaceTimes(const char* raceName, JsonObject races_sessions) {
   Serial.print("Next Race: ");
   Serial.println(raceName);
 
-  printConvertedTime("FP1", races_sessions["fp1"].as<const char*>());
-  if (races_sessions.containsKey("sprint")) {
-    //Is a sprint Weekend, order is different
-    printConvertedTime("Qualifying", races_sessions["qualifying"].as<const char*>());
-    printConvertedTime("FP2", races_sessions["fp2"].as<const char*>());
-    printConvertedTime("Sprint", races_sessions["sprint"].as<const char*>());
-
-  } else {
-    printConvertedTime("FP2", races_sessions["fp2"].as<const char*>());
-    printConvertedTime("FP3", races_sessions["fp3"].as<const char*>());
-    printConvertedTime("Qualifying", races_sessions["qualifying"].as<const char*>());
+  for (JsonPair kv : races_sessions) {
+    printConvertedTime(sessionCodeToString(kv.key().c_str()),
+                       kv.value().as<const char*>());
   }
-
-  printConvertedTime("Race", races_sessions["gp"].as<const char*>());
 
 }
 
@@ -58,42 +79,49 @@ String createTelegramMessageString(const char* raceName, JsonObject races_sessio
   message += "\n";
   message += "---------------------\n";
 
-  message += "FP1: ";
-  message += getConvertedTime(races_sessions["fp1"].as<const char*>());
-  message += "\n";
-
-  if (races_sessions.containsKey("sprint")) {
-    //Is a sprint Weekend, order is different
-    message += "Qualifying: ";
-    message += getConvertedTime(races_sessions["qualifying"].as<const char*>());
+  for (JsonPair kv : races_sessions) {
+    String sessionName = String(sessionCodeToString(kv.key().c_str()));
+    message += sessionName;
+    message += getConvertedTime(kv.value().as<const char*>(), "");
     message += "\n";
-
-    message += "FP2: ";
-    message += getConvertedTime(races_sessions["fp2"].as<const char*>());
-    message += "\n";
-
-    message += "Sprint: ";
-    message += getConvertedTime(races_sessions["sprint"].as<const char*>());
-    message += "\n";
-
-  } else {
-    message += "FP2: ";
-    message += getConvertedTime(races_sessions["fp2"].as<const char*>());
-    message += "\n";
-
-    message += "FP3: ";
-    message += getConvertedTime(races_sessions["fp3"].as<const char*>());
-    message += "\n";
-
-    message += "Qualifying: ";
-    message += getConvertedTime(races_sessions["qualifying"].as<const char*>());
-    message += "\n";
-
   }
 
-  message += "Race: ";
-  message += getConvertedTime(races_sessions["gp"].as<const char*>());
-  message += "\n";
+  //  message += "FP1: ";
+  //  message += getConvertedTime(races_sessions["fp1"].as<const char*>(), "");
+  //  message += "\n";
+  //
+  //  if (races_sessions.containsKey("sprint")) {
+  //    //Is a sprint Weekend, order is different
+  //    message += "Qualifying: ";
+  //    message += getConvertedTime(races_sessions["qualifying"].as<const char*>(), "");
+  //    message += "\n";
+  //
+  //    message += "FP2: ";
+  //    message += getConvertedTime(races_sessions["fp2"].as<const char*>(), "");
+  //    message += "\n";
+  //
+  //    message += "Sprint: ";
+  //    message += getConvertedTime(races_sessions["sprint"].as<const char*>(), "");
+  //    message += "\n";
+  //
+  //  } else {
+  //    message += "FP2: ";
+  //    message += getConvertedTime(races_sessions["fp2"].as<const char*>(), "");
+  //    message += "\n";
+  //
+  //    message += "FP3: ";
+  //    message += getConvertedTime(races_sessions["fp3"].as<const char*>(), "");
+  //    message += "\n";
+  //
+  //    message += "Qualifying: ";
+  //    message += getConvertedTime(races_sessions["qualifying"].as<const char*>(), "");
+  //    message += "\n";
+  //
+  //  }
+  //
+  //  message += "Race: ";
+  //  message += getConvertedTime(races_sessions["gp"].as<const char*>(), "");
+  //  message += "\n";
   return message;
 }
 
@@ -119,12 +147,12 @@ bool sendNotificationOfNextRace(UniversalTelegramBot *bot, int offset) {
 
   Serial.print("Sending message to ");
   Serial.println(rl_f1Config.chatId);
-  
+
   return bot->sendPhoto(rl_f1Config.chatId, "https://i.imgur.com/q3qsfSi.png", createTelegramMessageString(races_name, races_sessions));
-  
+
 }
 
-bool getNextRace(int &offset, bool &notificationSent) {
+bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display) {
 
   StaticJsonDocument<112> filter;
 
@@ -173,6 +201,7 @@ bool getNextRace(int &offset, bool &notificationSent) {
       } else {
         Serial.println("Same Race as before");
       }
+      f1Display->printRaceToScreen(races_name, races_sessions);
       printRaceTimes(races_name, races_sessions);
       return newRace;
     }
@@ -189,3 +218,5 @@ time_t getNotifyTime() {
   // Probably should make this smarter so it's not sending notifications in the middle of the night!
   return t;
 }
+
+#endif
