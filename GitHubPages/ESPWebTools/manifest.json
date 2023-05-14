@@ -6,19 +6,19 @@
             "chipFamily": "ESP32",
             "parts": [
                 {
-                    "path": "esp32Firmware/boot_app0.bin",
+                    "path": "boot_app0.bin",
                     "offset": 57344
                 },
                 {
-                    "path": "esp32Firmware/esp32.esp32.esp32/F1-Notifications.ino.bin",
+                    "path": "esp32.esp32.esp32/F1-Notifications.ino.bin",
                     "offset": 65536
                 },
                 {
-                    "path": "esp32Firmware/esp32.esp32.esp32/F1-Notifications.ino.bootloader.bin",
+                    "path": "esp32.esp32.esp32/F1-Notifications.ino.bootloader.bin",
                     "offset": 4096
                 },
                 {
-                    "path": "esp32Firmware/esp32.esp32.esp32/F1-Notifications.ino.partitions.bin",
+                    "path": "esp32.esp32.esp32/F1-Notifications.ino.partitions.bin",
                     "offset": 32768
                 }
             ]

@@ -10,23 +10,33 @@
     <div id="main" style="display: none;">
 
 
-        <span>After flashing the project, please do stuff <!--<a href="https://github.com/witnessmenow/Spotify-Diy-Thing#project-setup">project's Github page</a>--> for setting it up
-            
+        <span>After flashing the project, please do stuff
+            <!--<a href="https://github.com/witnessmenow/Spotify-Diy-Thing#project-setup">project's Github page</a>-->
+            for setting it up
+
         </span>
 
         <br>
+        <span>CYD</span>
         <script type="module" src="https://unpkg.com/esp-web-tools@7.3.1/dist/web/install-button.js?module">"></script>
-        <esp-web-install-button id="installButton" manifest="ESPWebTools/manifest.json"></esp-web-install-button>
+        <esp-web-install-button id="installButtonCyd" manifest="ESPWebTools/cyd/manifest.json"></esp-web-install-button>
+        <br>
+
+        <br>
+        <span>Matrix</span>
+        <script type="module" src="https://unpkg.com/esp-web-tools@7.3.1/dist/web/install-button.js?module">"></script>
+        <esp-web-install-button id="installButtonMatrix"
+            manifest="ESPWebTools/matrix/manifest.json"></esp-web-install-button>
         <br>
         <span>NOTE: Make sure to close anything using your devices com port (e.g. Serial monitor)</span>
     </div>
     <div id="notSupported" style="display: none;">
         Your browser does not support the Web Serial API.
     </div>
-    
+
 
     <script>
-        if(navigator.serial){
+        if (navigator.serial) {
             document.getElementById("notSupported").style.display = 'none';
             document.getElementById("main").style.display = 'block';
         } else {
