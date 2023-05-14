@@ -72,7 +72,7 @@ jobs:
           # No need to specify ESP-libraries as these are installed with the platform (on the line above). 
           # Downloading SpeedyStepper from source to get correct casing on import of Arduino.h (spelled arduino.h in the version from Arduino Library Manager)
           libraries: | 
-              - name: ImageFetcher
+            - name: ImageFetcher
               source-url: https://github.com/witnessmenow/file-fetcher-arduino.git
           sketch-paths: |
             - F1-Notifications
