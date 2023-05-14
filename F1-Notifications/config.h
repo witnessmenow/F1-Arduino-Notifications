@@ -69,10 +69,12 @@ class F1Config {
             return false;
           }
         }
-      } else {
-        Serial.println("Config file does not exist");
-        return false;
       }
+
+
+      Serial.println("Config file does not exist");
+      return false;
+
     }
 
     bool saveConfigFile() {

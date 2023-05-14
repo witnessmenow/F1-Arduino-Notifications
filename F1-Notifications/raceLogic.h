@@ -113,8 +113,6 @@ bool sendNotificationOfNextRace(UniversalTelegramBot *bot, int offset) {
   }
   JsonArray races = doc["races"];
 
-  int racesAmount = races.size();
-
   const char* races_name = races[offset]["name"];
   JsonObject races_sessions = races[offset]["sessions"];
 
@@ -185,7 +183,6 @@ bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display) {
     const char* race_sessions_gp = races_sessions["gp"]; // "2023-03-05T15:00:00Z"
 
     struct tm tm = {0};
-    char buf[100];
 
     // Convert to tm struct
     //Sample format: 2023-03-17T13:30:00Z
