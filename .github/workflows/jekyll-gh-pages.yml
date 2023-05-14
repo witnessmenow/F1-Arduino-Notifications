@@ -115,6 +115,7 @@ jobs:
             - name: ImageFetcher
               source-url: https://github.com/witnessmenow/file-fetcher-arduino.git
             - name: ESP32 HUB75 LED MATRIX PANEL DMA Display
+            - name: Adafruit GFX Library
           sketch-paths: |
             - F1-Notifications
           enable-warnings-report: true
