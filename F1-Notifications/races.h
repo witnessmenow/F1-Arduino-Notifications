@@ -9,6 +9,7 @@ R"(
       "round": 1,
       "slug": "bahrain-grand-prix",
       "localeKey": "bahrain-grand-prix",
+      "circuitImage": "https://imgur.com/zUqArqi.png",
       "sessions": {
         "fp1": "2023-03-03T11:30:00Z",
         "fp2": "2023-03-03T15:00:00Z",
@@ -25,6 +26,7 @@ R"(
       "round": 2,
       "slug": "saudi-arabia-grand-prix",
       "localeKey": "saudi-arabia-grand-prix",
+      "circuitImage": "https://imgur.com/vx6MDSF.png",
       "sessions": {
         "fp1": "2023-03-17T13:30:00Z",
         "fp2": "2023-03-17T17:00:00Z",
@@ -41,6 +43,7 @@ R"(
       "round": 3,
       "slug": "australian-grand-prix",
       "localeKey": "australian-grand-prix",
+      "circuitImage": "https://i.imgur.com/ewrhVKU.png",
       "sessions": {
         "fp1": "2023-03-31T01:30:00Z",
         "fp2": "2023-03-31T05:00:00Z",
@@ -57,6 +60,7 @@ R"(
       "round": 5,
       "slug": "azerbaijan-grand-prix",
       "localeKey": "azerbaijan-grand-prix",
+      "circuitImage": "https://imgur.com/H2C6G2Q.png",
       "sessions": {
         "fp1": "2023-04-28T09:30:00Z",
         "qualifying": "2023-04-28T13:00:00Z",
@@ -73,6 +77,7 @@ R"(
       "round": 6,
       "slug": "miami-grand-prix",
       "localeKey": "miami-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245035/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Miami%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-05-05T18:30:00Z",
         "fp2": "2023-05-05T22:00:00Z",
@@ -89,6 +94,7 @@ R"(
       "round": 7,
       "slug": "emilia-romagna-grand-prix",
       "localeKey": "emilia-romagna-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245032/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Emilia%20Romagna%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-05-19T11:30:00Z",
         "fp2": "2023-05-19T15:00:00Z",
@@ -105,6 +111,7 @@ R"(
       "round": 8,
       "slug": "monaco-grand-prix",
       "localeKey": "monaco-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245032/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Monte%20Carlo%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-05-26T11:30:00Z",
         "fp2": "2023-05-26T15:00:00Z",
@@ -121,6 +128,7 @@ R"(
       "round": 9,
       "slug": "spanish-grand-prix",
       "localeKey": "spanish-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245030/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Spain%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-06-02T11:30:00Z",
         "fp2": "2023-06-02T15:00:00Z",
@@ -137,6 +145,7 @@ R"(
       "round": 10,
       "slug": "canadian-grand-prix",
       "localeKey": "canadian-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Canada%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-06-16T17:30:00Z",
         "fp2": "2023-06-16T21:00:00Z",
@@ -153,6 +162,7 @@ R"(
       "round": 11,
       "slug": "austrian-grand-prix",
       "localeKey": "austrian-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Austria%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-06-30T11:30:00Z",
         "qualifying": "2023-06-30T15:00:00Z",
@@ -169,6 +179,7 @@ R"(
       "round": 12,
       "slug": "british-grand-prix",
       "localeKey": "british-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Great%20Britain%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-07-07T11:30:00Z",
         "fp2": "2023-07-07T15:00:00Z",
@@ -185,6 +196,7 @@ R"(
       "round": 13,
       "slug": "hungarian-grand-prix",
       "localeKey": "hungarian-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Hungar%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-07-21T11:30:00Z",
         "fp2": "2023-07-21T15:00:00Z",
@@ -201,6 +213,7 @@ R"(
       "round": 14,
       "slug": "belgian-grand-prix",
       "localeKey": "belgian-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Belgium%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-07-28T11:30:00Z",
         "qualifying": "2023-07-28T15:00:00Z",
@@ -217,6 +230,7 @@ R"(
       "round": 15,
       "slug": "dutch-grand-prix",
       "localeKey": "dutch-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245033/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Netherlands%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-08-25T10:30:00Z",
         "fp2": "2023-08-25T14:00:00Z",
@@ -233,6 +247,7 @@ R"(
       "round": 16,
       "slug": "italian-grand-prix",
       "localeKey": "italian-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245031/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Italy%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-09-01T11:30:00Z",
         "fp2": "2023-09-01T15:00:00Z",
@@ -249,6 +264,7 @@ R"(
       "round": 17,
       "slug": "singapore-grand-prix",
       "localeKey": "singapore-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245031/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Singapor%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-09-15T09:30:00Z",
         "fp2": "2023-09-15T13:00:00Z",
@@ -265,6 +281,7 @@ R"(
       "round": 18,
       "slug": "japanese-grand-prix",
       "localeKey": "japanese-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245031/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Japan%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-09-22T02:30:00Z",
         "fp2": "2023-09-22T06:00:00Z",
@@ -281,6 +298,7 @@ R"(
       "round": 19,
       "slug": "qatar-grand-prix",
       "localeKey": "qatar-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245031/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Qatar%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-10-06T13:30:00Z",
         "qualifying": "2023-10-06T17:00:00Z",
@@ -297,6 +315,7 @@ R"(
       "round": 20,
       "slug": "us-grand-prix",
       "localeKey": "us-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245035/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/USA%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-10-20T17:30:00Z",
         "qualifying": "2023-10-20T21:00:00Z",
@@ -313,6 +332,7 @@ R"(
       "round": 21,
       "slug": "mexican-grand-prix",
       "localeKey": "mexico-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Mexico%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-10-27T18:30:00Z",
         "fp2": "2023-10-27T22:00:00Z",
@@ -329,6 +349,7 @@ R"(
       "round": 22,
       "slug": "brazilian-grand-prix",
       "localeKey": "brazilian-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Brazil%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-11-03T14:30:00Z",
         "qualifying": "2023-11-03T18:00:00Z",
@@ -345,6 +366,7 @@ R"(
       "round": 23,
       "slug": "las-vegas-grand-prix",
       "localeKey": "las-vegas-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/f_auto/q_auto/v1677249931/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Las%20Vegas%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-11-17T04:30:00Z",
         "fp2": "2023-11-17T08:00:00Z",
@@ -361,6 +383,7 @@ R"(
       "round": 24,
       "slug": "abu-dhabi-grand-prix",
       "localeKey": "abu-dhabi-grand-prix",
+      "circuitImage": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/Abu%20Dhab%20carbon.png.transform/3col/image.png",
       "sessions": {
         "fp1": "2023-11-24T09:30:00Z",
         "fp2": "2023-11-24T13:00:00Z",

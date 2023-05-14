@@ -12,6 +12,30 @@
     YouTube: https://www.youtube.com/brianlough
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
+// ----------------------------
+// Display type
+// ---------------------------
+
+// This project currently supports the following displays
+// (Uncomment the required #define)
+
+// 1. Cheap yellow display (Using TFT-eSPI library)
+//#define YELLOW_DISPLAY 
+
+// 2. Matrix Displays (Like the ESP32 Trinity)
+#define MATRIX_DISPLAY
+
+// If no defines are set, it will default to CYD
+#if !defined(YELLOW_DISPLAY) && !defined(MATRIX_DISPLAY)
+#define YELLOW_DISPLAY // Default to Yellow Display for display type
+#endif
+
+
+// ----------------------------
+// Library Defines - Need to be defined before library import
+// ----------------------------
+
+#define ESP_DRD_USE_SPIFFS      true
 
 // ----------------------------
 // Standard Libraries
@@ -19,9 +43,26 @@
 
 #include <WiFi.h>
 
+#include <WiFiClientSecure.h>
+
+#include <FS.h>
+#include "SPIFFS.h"
+
 // ----------------------------
 // Additional Libraries - each one of these will need to be installed.
 // ----------------------------
+
+#include <WiFiManager.h>
+// Captive portal for configuring the WiFi
+
+// If installing from the library manager (Search for "WifiManager")
+// https://github.com/tzapu/WiFiManager
+
+#include <ESP_DoubleResetDetector.h>
+// A library for checking if the reset button has been pressed twice
+// Can be used to enable config mode
+// Can be installed from the library manager (Search for "ESP_DoubleResetDetector")
+//https://github.com/khoih-prog/ESP_DoubleResetDetector
 
 #include <ArduinoJson.h>
 // Library used for parsing Json from the API responses
@@ -36,81 +77,101 @@
 // Search for "ezTime" in the Arduino Library manager
 // https://github.com/ropg/ezTime
 
-// -------------------------------------
-// ------- Replace the following! ------
-// -------------------------------------
+#include <UniversalTelegramBot.h>
+// Library used to send Telegram Message
 
-//How the time will be displayed, see here for more info: https://github.com/ropg/ezTime#datetime
-String timeFormat = "l, d-M-Y H:i"; // Friday, 17-Mar-2023 00:30
+// Search for "Universal Telegram" in the Arduino Library manager
+// https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot
+
+#include <FileFetcher.h>
+// Library used to get files or images
+
+// Not on library manager yet
+// https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot
+
+// ----------------------------
+// Internal includes
+// ----------------------------
+
+#include "githubCert.h"
+
+#include "display.h"
+
+#include "config.h"
+
+#include "raceLogic.h"
+
+#include "wifiManager.h"
+
+// ----------------------------
+// Display Handling Code
+// ----------------------------
+
+#if defined YELLOW_DISPLAY
+
+#include "cheapYellowLCD.h"
+CheapYellowDisplay cyd;
+F1Display* f1Display = &cyd;
+
+#elif defined MATRIX_DISPLAY
+
+#include "matrixDisplay.h"
+MatrixDisplay matrixDisplay;
+F1Display* f1Display = &matrixDisplay;
+
+#endif
+// ----------------------------
+
+WiFiClientSecure secured_client;
+UniversalTelegramBot bot("", secured_client);
+
+F1Config f1Config;
 
 
-String timeZone = "Europe/London"; //seems to be something wrong with Europe/Dublin
-
-// Wifi network station credentials
-char ssid[] = "ssid";     // your network SSID (name)
-char password[] = "password"; // your network key
-
-// -------------------------------------
-
-// races.h is a file made up of this JSON file from F1Calendar.com
-// https://github.com/sportstimes/f1/blob/main/_db/f1/2023.json
-const char *racesJson =
-#include "races.h"
-  ;
-
-Timezone myTZ;
-
-void printRaceTimes(const char* raceName, JsonObject races_sessions) {
-  Serial.print("Next Race: ");
-  Serial.println(raceName);
-
-  printConvertedTime("FP1", races_sessions["fp1"].as<const char*>());
-  if (races_sessions.containsKey("sprint")) {
-    //Is a sprint Weekend, order is different
-    printConvertedTime("Qualifying", races_sessions["qualifying"].as<const char*>());
-    printConvertedTime("FP2", races_sessions["fp2"].as<const char*>());
-    printConvertedTime("Sprint", races_sessions["sprint"].as<const char*>());
-
-  } else {
-    printConvertedTime("FP2", races_sessions["fp2"].as<const char*>());
-    printConvertedTime("FP3", races_sessions["fp3"].as<const char*>());
-    printConvertedTime("Qualifying", races_sessions["qualifying"].as<const char*>());
-  }
-
-  printConvertedTime("Race", races_sessions["gp"].as<const char*>());
-
-}
-
-void printConvertedTime(const char* sessionName, const char* sessionStartTime) {
-
-  String timeStr = getConvertedTime(sessionStartTime);
-  Serial.print(sessionName);
-  Serial.print(": ");
-  Serial.println(timeStr);
-
-}
-
-String getConvertedTime(const char* sessionStartTime) {
-  struct tm tm = {0};
-  // Parse date from UTC and convert to an epoch
-  strptime(sessionStartTime, "%Y-%m-%dT%H:%M:%S", &tm);
-  time_t sessionEpoch = mktime(&tm);
-  
-  return myTZ.dateTime(sessionEpoch, UTC_TIME, timeFormat);
-}
+FileFetcher fileFetcher(secured_client);
 
 void setup() {
   // put your setup code here, to run once:
 
   Serial.begin(115200);
 
-  Serial.print("Connecting Wifi: ");
-  Serial.println(ssid);
+  f1Display->displaySetup();
+
+  bool forceConfig = false;
+
+  drd = new DoubleResetDetector(DRD_TIMEOUT, DRD_ADDRESS);
+  if (drd->detectDoubleReset()) {
+    Serial.println(F("Forcing config mode as there was a Double reset detected"));
+    forceConfig = true;
+  }
+
+  // Initialise SPIFFS, if this fails try .begin(true)
+  // NOTE: I believe this formats it though it will erase everything on
+  // spiffs already! In this example that is not a problem.
+  // I have found once I used the true flag once, I could use it
+  // without the true flag after that.
+  bool spiffsInitSuccess = SPIFFS.begin(false) || SPIFFS.begin(true);
+  if (!spiffsInitSuccess)
+  {
+    Serial.println("SPIFFS initialisation failed!");
+    while (1)
+      yield(); // Stay here twiddling thumbs waiting
+  }
+  Serial.println("\r\nInitialisation done.");
+
+  if (!f1Config.fetchConfigFile()) {
+    // Failed to fetch config file, need to launch Wifi Manager
+    forceConfig = true;
+  }
+
+  setupWiFiManager(forceConfig, f1Config);
+  raceLogicSetup(f1Config);
+  bot.updateToken(f1Config.botToken);
 
   // Set WiFi to station mode and disconnect from an AP if it was Previously
   // connected
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  //WiFi.mode(WIFI_STA);
+  //WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
@@ -122,6 +183,16 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
+  secured_client.setCACert(github_server_cert);
+  while (fetchRaceJson(fileFetcher) != 1) {
+    Serial.println("failed to get Race Json");
+    Serial.println("will try again in 10 seconds");
+    delay(1000 * 10);
+  }
+
+  Serial.println("Fetched races.json File");
+
+
   Serial.println("Waiting for time sync");
 
   waitForSync();
@@ -129,52 +200,60 @@ void setup() {
   Serial.println();
   Serial.println("UTC:             " + UTC.dateTime());
 
-  myTZ.setLocation(timeZone);
-  Serial.print(timeZone);
+  myTZ.setLocation(f1Config.timeZone);
+  Serial.print(f1Config.timeZone);
   Serial.print(F(":     "));
   Serial.println(myTZ.dateTime());
   Serial.println("-------------------------");
 
-
-  DynamicJsonDocument doc(12288);
-
-  DeserializationError error = deserializeJson(doc, racesJson);
-
-  if (error) {
-    Serial.print("deserializeJson() failed: ");
-    Serial.println(error.c_str());
-    return;
-  }
-
-  JsonArray races = doc["races"];
-
-  int racesAmount = races.size();
-  time_t timeNow = UTC.now();
-  for (int i = 0; i < racesAmount; i++) {
-    const char* races_name = races[i]["name"];
-    JsonObject races_sessions = races[i]["sessions"];
-    const char* race_sessions_gp = races_sessions["gp"]; // "2023-03-05T15:00:00Z"
-
-    struct tm tm = {0};
-    char buf[100];
-
-    // Convert to tm struct
-    //Sample format: 2023-03-17T13:30:00Z
-    strptime(race_sessions_gp, "%Y-%m-%dT%H:%M:%S", &tm);
-
-    time_t gpStartEpoch = mktime(&tm);
-
-    if (timeNow < gpStartEpoch) {
-      printRaceTimes(races_name, races_sessions);
-      return;
-    }
-
-  }
-
+  //sendNotificationOfNextRace(&bot, f1Config.roundOffset);
 
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void sendNotification() {
+  // Cause it could be set to the image one
+  secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT);
+  Serial.println("Sending notifcation");
+  f1Config.currentRaceNotification = sendNotificationOfNextRace(&bot, f1Config.roundOffset);
+  if (!f1Config.currentRaceNotification) {
+    //Notificaiton failed, raise event again
+    Serial.println("Notfication failed");
+    setEvent( sendNotification, getNotifyTime() );
+  } else {
 
+    f1Config.saveConfigFile();
+  }
+}
+
+bool first = true;
+
+int minuteCounter = 0;
+
+void loop() {
+  drd->loop();
+  if (first || minuteChanged()) {
+    minuteCounter ++;
+    first = false;
+    bool newRace = getNextRace(f1Config.roundOffset, f1Config.currentRaceNotification, f1Display);
+    if (newRace) {
+      f1Config.saveConfigFile();
+    }
+    if (!f1Config.currentRaceNotification) {
+      //we have never notified about this race yet, so we'll raise an event
+      setEvent( sendNotification, getNotifyTime() );
+      Serial.print("Raised event for: ");
+      Serial.println(myTZ.dateTime(getNotifyTime(), UTC_TIME, f1Config.timeFormat));
+    }
+  }
+
+  if (minuteCounter >= 60) {
+    secured_client.setCACert(github_server_cert);
+    while (fetchRaceJson(fileFetcher) != 1) {
+      Serial.println("failed to get Race Json");
+      Serial.println("will try again in 10 seconds");
+      delay(1000 * 10);
+    }
+    minuteCounter = 0;
+  }
+  events();
 }
