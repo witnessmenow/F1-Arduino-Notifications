@@ -61,7 +61,7 @@ jobs:
         run: |
           \cp -fR DisplayConfig/User_Setup.h ~/Arduino/libraries/TFT_eSPI/
 
-      # Build Arduino Code
+      # Build CYD Arduino Code
       - uses: arduino/compile-sketches@v1
         name: Compile CYD code
         with: 
@@ -101,9 +101,9 @@ jobs:
           # Using a version agnostic search to find the file. grep -m 1 makes sure only one file is copied in case multiple versions are installed.
           find /home/runner/.arduino15/packages/esp32/hardware/esp32/ -type f | grep -i -m 1 boot_app0.bin$ | xargs -i cp {} GitHubPages/ESPWebTools/cyd
 
-      # Build Arduino Code
+      # Build Matrix Arduino Code
       - uses: arduino/compile-sketches@v1
-        name: Compile CYD code
+        name: Compile Matrix code
         with: 
           fqbn: "esp32:esp32:esp32"
           platforms: |
@@ -120,9 +120,10 @@ jobs:
           enable-warnings-report: true
           verbose: true
           cli-compile-flags: |
-            - --export-binaries --build-properties compiler.cpp.extra_flag=-DMATRIX_DISPLAY
-            # Copy binaries to GitHubPages folder for publishing
-
+            - --export-binaries
+            - --build-property "build.extra_flags=\"-DMATRIX_DISPLAY\""
+            
+      # Copy binaries to GitHubPages folder for publishing
       - name: Copy compiled binaries to Matrix
         run: |
           # Make matrix directory
