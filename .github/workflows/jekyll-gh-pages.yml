@@ -120,8 +120,9 @@ jobs:
           enable-warnings-report: true
           verbose: true
           cli-compile-flags: |
+            - --build-property 
+            - compiler.cpp.extra_flags=-DMATRIX_DISPLAY
             - --export-binaries
-            - --build-property compiler.cpp.extra_flags=-DMATRIX_DISPLAY
             
       # Copy binaries to GitHubPages folder for publishing
       - name: Copy compiled binaries to Matrix
