@@ -28,7 +28,7 @@ bool isRaceWeek(const char* sessionStartTime) {
   // Parse date from UTC and convert to an epoch
   strptime(sessionStartTime, "%Y-%m-%dT%H:%M:%S", &tm);
 
-  time_t sixDaysBeforeRaceEpoch = mktime(&tm) - (5 * SECS_PER_DAY);
+  time_t sixDaysBeforeRaceEpoch = mktime(&tm) - (6 * SECS_PER_DAY);
   return UTC.now() > sixDaysBeforeRaceEpoch;
 }
 
