@@ -1,5 +1,4 @@
 #include "display.h"
-#include "raceLogic.h"
 
 #include <TFT_eSPI.h>
 // A library for interfacing with LCD displays
@@ -15,7 +14,7 @@
 
 // -------------------------------
 // Putting this stuff outside the class because
-// I can't easily pass member functions in as callbacks for pngdec 
+// I can't easily pass member functions in as callbacks for pngdec
 // -------------------------------
 
 TFT_eSPI tft = TFT_eSPI();
@@ -66,6 +65,8 @@ class CheapYellowDisplay: public F1Display {
     void printRaceToScreen(const char* raceName, JsonObject races_sessions) {
       Serial.println("prts");
       tft.fillRect(0, 0, screenWidth, screenHeight, TFT_BLACK);
+
+      // It's race week!
       String tempStr = "Next Race: ";
       tempStr += String(raceName);
 
@@ -106,6 +107,27 @@ class CheapYellowDisplay: public F1Display {
       return rc;
     }
 
+    void drawWifiManagerMessage(WiFiManager *myWiFiManager) {
+      Serial.println("Entered Conf Mode");
+      tft.fillScreen(TFT_BLACK);
+      tft.setTextColor(TFT_WHITE, TFT_BLACK);
+      tft.drawCentreString("Entered Conf Mode:", screenCenterX, 5, 2);
+      tft.drawString("Connect to the following WIFI AP:", 5, 28, 2);
+      tft.setTextColor(TFT_BLUE, TFT_BLACK);
+      tft.drawString(myWiFiManager->getConfigPortalSSID(), 20, 48, 2);
+      tft.setTextColor(TFT_WHITE, TFT_BLACK);
+      tft.drawString("Password:", 5, 64, 2);
+      tft.setTextColor(TFT_BLUE, TFT_BLACK);
+      tft.drawString("nomikey1", 20, 82, 2);
+      tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
+      tft.drawString("If it doesn't AutoConnect, use this IP:", 5, 110, 2);
+      tft.setTextColor(TFT_BLUE, TFT_BLACK);
+      tft.drawString(WiFi.softAPIP().toString(), 20, 128, 2);
+      tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
+    }
+
   private:
 
     void printSession(int x, int y, const char* sessionName, String sessionStartTime) {
@@ -116,25 +138,3 @@ class CheapYellowDisplay: public F1Display {
     }
 
 };
-
-
-//void drawWifiManagerMessage(WiFiManager *myWiFiManager){
-//  Serial.println("Entered Conf Mode");
-//  tft.fillScreen(TFT_BLACK);
-//  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-//  tft.drawCentreString("Entered Conf Mode:", screenCenterX, 5, 2);
-//  tft.drawString("Connect to the following WIFI AP:", 5, 28, 2);
-//  tft.setTextColor(TFT_BLUE, TFT_BLACK);
-//  tft.drawString(myWiFiManager->getConfigPortalSSID(), 20, 48, 2);
-//  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-//  tft.drawString("Password:", 5, 64, 2);
-//  tft.setTextColor(TFT_BLUE, TFT_BLACK);
-//  tft.drawString("thing123", 20, 82, 2);
-//  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-//
-//  tft.drawString("If it doesn't AutoConnect, use this IP:", 5, 110, 2);
-//  tft.setTextColor(TFT_BLUE, TFT_BLACK);
-//  tft.drawString(WiFi.softAPIP().toString(), 20, 128, 2);
-//  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-//
-//}

@@ -1,5 +1,4 @@
 #include "display.h"
-#include "raceLogic.h"
 
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 // This is the library for interfacing with the display
@@ -77,34 +76,91 @@ class MatrixDisplay: public F1Display {
     }
 
     void printRaceToScreen(const char* raceName, JsonObject races_sessions) {
-      dma_display->fillScreen(myBLACK);
-      dma_display->setTextSize(1);     // size 2 == 16 pixels high
-      dma_display->setTextWrap(false); // N.B!! Don't wrap at end of line
 
-      int16_t xOne, yOne;
-      uint16_t w, h;
 
-      // This method updates the variables with what width (w) and height (h)
-      // the give text will have.
+      const char* raceNameChanged = updateRaceName(raceName);
+      if (isRaceWeek(races_sessions["gp"])) {
+        // It's race week!
+        dma_display->fillScreen(myBLACK);
+        dma_display->setTextSize(1);     // size 2 == 16 pixels high
+        dma_display->setTextWrap(false); // N.B!! Don't wrap at end of line
 
-      dma_display->getTextBounds(raceName, 0, 0, &xOne, &yOne, &w, &h);
+        int16_t xOne, yOne;
+        uint16_t w, h;
 
-      int xPosition = screenCenterX - w / 2;
-      dma_display->setTextColor(myBLUE);
-      dma_display->setCursor(xPosition, 2);
-      dma_display->print(raceName);
+        // This method updates the variables with what width (w) and height (h)
+        // the give text will have.
 
-      int yValue = 12;
-      for (JsonPair kv : races_sessions) {
-        printSession( yValue,
-                      matrixSessionCodeToString(kv.key().c_str()),
-                      getConvertedTime(kv.value().as<const char*>(), "H:i"));
-        yValue += 10;
+        dma_display->getTextBounds(raceNameChanged, 0, 0, &xOne, &yOne, &w, &h);
+
+        int xPosition = screenCenterX - w / 2;
+        dma_display->setTextColor(myBLUE);
+        dma_display->setCursor(xPosition, 2);
+        dma_display->print(raceNameChanged);
+
+        int yValue = 12;
+        for (JsonPair kv : races_sessions) {
+          printSession( yValue,
+                        matrixSessionCodeToString(kv.key().c_str()),
+                        getConvertedTime(kv.value().as<const char*>(), "H:i"));
+          yValue += 10;
+        }
+      } else {
+        // Not yet race week
+        dma_display->fillScreen(myBLACK);
+        dma_display->setTextSize(1);     // size 2 == 16 pixels high
+        dma_display->setTextWrap(false); // N.B!! Don't wrap at end of line
+
+        int16_t xOne, yOne;
+        uint16_t w, h;
+
+        // This method updates the variables with what width (w) and height (h)
+        // the give text will have.
+        dma_display->getTextBounds("Next Race:", 0, 0, &xOne, &yOne, &w, &h);
+        int xPosition = screenCenterX - w / 2;
+        dma_display->setTextColor(myGREEN);
+        dma_display->setCursor(xPosition, 2);
+        dma_display->print("Next Race:");
+        
+        
+        
+
+        // This method updates the variables with what width (w) and height (h)
+        // the give text will have.
+
+        dma_display->getTextBounds(raceNameChanged, 0, 0, &xOne, &yOne, &w, &h);
+
+        xPosition = screenCenterX - w / 2;
+        dma_display->setTextColor(myBLUE);
+        dma_display->setCursor(xPosition, 10);
+        dma_display->print(raceNameChanged);
+
+        printSession( 20,
+                      "GP:",
+                        getConvertedTime(races_sessions["gp"], "M d"));
+        
       }
+
+
     }
 
     int displayImage(char *imageFileUri) {
       return 0;
+    }
+
+    void drawWifiManagerMessage(WiFiManager *myWiFiManager) {
+      Serial.println("Entered Conf Mode");
+      dma_display->fillScreen(myBLACK);
+      dma_display->setTextSize(1);     // size 1 == 8 pixels high
+      dma_display->setTextWrap(false);
+      dma_display->setTextColor(myBLUE);
+      dma_display->setCursor(0, 0);
+      dma_display->print(myWiFiManager->getConfigPortalSSID());
+
+      dma_display->setTextWrap(true);
+      dma_display->setTextColor(myRED);
+      dma_display->setCursor(0, 8);
+      dma_display->print(WiFi.softAPIP());
     }
 
   private:
@@ -136,6 +192,15 @@ class MatrixDisplay: public F1Display {
       return "UNKNOWN";
     }
 
+    const char* updateRaceName(const char* sessionCode){
+      if (strcmp(sessionCode, "Emilia Romagna Grand Prix") == 0)
+      {
+        return "Monza";
+      }
+
+      return sessionCode;
+    }
+
     void printSession(int y, const char* sessionName, String sessionStartTime) {
 
       // Print Session Name on the left
@@ -165,25 +230,3 @@ class MatrixDisplay: public F1Display {
     }
 
 };
-
-
-//void drawWifiManagerMessage(WiFiManager *myWiFiManager){
-//  Serial.println("Entered Conf Mode");
-//  tft.fillScreen(TFT_BLACK);
-//  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-//  tft.drawCentreString("Entered Conf Mode:", screenCenterX, 5, 2);
-//  tft.drawString("Connect to the following WIFI AP:", 5, 28, 2);
-//  tft.setTextColor(TFT_BLUE, TFT_BLACK);
-//  tft.drawString(myWiFiManager->getConfigPortalSSID(), 20, 48, 2);
-//  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-//  tft.drawString("Password:", 5, 64, 2);
-//  tft.setTextColor(TFT_BLUE, TFT_BLACK);
-//  tft.drawString("thing123", 20, 82, 2);
-//  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-//
-//  tft.drawString("If it doesn't AutoConnect, use this IP:", 5, 110, 2);
-//  tft.setTextColor(TFT_BLUE, TFT_BLACK);
-//  tft.drawString(WiFi.softAPIP().toString(), 20, 128, 2);
-//  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-//
-//}

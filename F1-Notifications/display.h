@@ -1,6 +1,7 @@
 
 #ifndef F1DISPLAY_H
 #define F1DISPLAY_H
+
 class F1Display {
   public:
     virtual void displaySetup() = 0;
@@ -8,6 +9,7 @@ class F1Display {
         Serial.println("Base Display Class - Print Race to Screen");
       };
     virtual int displayImage(char *imageFileUri) = 0;
+    virtual void drawWifiManagerMessage(WiFiManager *myWiFiManager) = 0;
 
     void setWidth(int w){
       screenWidth = w;

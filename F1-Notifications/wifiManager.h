@@ -13,6 +13,7 @@
 #define WM_F1_NOTIFCATION_LABEL "notification"
 
 DoubleResetDetector* drd;
+F1Display* wm_Display;
 
 //flag for saving data
 bool shouldSaveConfig = false;
@@ -23,12 +24,17 @@ void saveConfigCallback () {
   shouldSaveConfig = true;
 }
 
-void setupWiFiManager(bool forceConfig, F1Config f1Config) {
+void configModeCallback (WiFiManager *myWiFiManager) {
+  wm_Display->drawWifiManagerMessage(myWiFiManager);
+}
+
+void setupWiFiManager(bool forceConfig, F1Config f1Config, F1Display* theDisplay) {
+  wm_Display = theDisplay;
   WiFiManager wm;
   //set config save notify callback
   wm.setSaveConfigCallback(saveConfigCallback);
   //set callback that gets called when connecting to previous WiFi fails, and enters Access Point mode
-  //wm.setAPCallback(configModeCallback);
+  wm.setAPCallback(configModeCallback);
 
   WiFiManagerParameter timeZoneParam(WM_F1_TIME_ZONE_LABEL, "Time Zone", f1Config.timeZone.c_str(), 60);
   WiFiManagerParameter timeFormatParam(WM_F1_TIME_FORMAT_LABEL, "Time Format", f1Config.timeFormat.c_str(), 40);

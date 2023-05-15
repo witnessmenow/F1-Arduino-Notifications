@@ -164,7 +164,7 @@ void setup() {
     forceConfig = true;
   }
 
-  setupWiFiManager(forceConfig, f1Config);
+  setupWiFiManager(forceConfig, f1Config, f1Display);
   raceLogicSetup(f1Config);
   bot.updateToken(f1Config.botToken);
 
@@ -210,6 +210,8 @@ void setup() {
 
 }
 
+bool notificaitonEventRaised = false;
+
 void sendNotification() {
   // Cause it could be set to the image one
   secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT);
@@ -220,7 +222,7 @@ void sendNotification() {
     Serial.println("Notfication failed");
     setEvent( sendNotification, getNotifyTime() );
   } else {
-
+    notificaitonEventRaised = false;
     f1Config.saveConfigFile();
   }
 }
@@ -238,9 +240,10 @@ void loop() {
     if (newRace) {
       f1Config.saveConfigFile();
     }
-    if (!f1Config.currentRaceNotification) {
+    if (!f1Config.currentRaceNotification && !notificaitonEventRaised) {
       //we have never notified about this race yet, so we'll raise an event
       setEvent( sendNotification, getNotifyTime() );
+      notificaitonEventRaised = true;
       Serial.print("Raised event for: ");
       Serial.println(myTZ.dateTime(getNotifyTime(), UTC_TIME, f1Config.timeFormat));
     }

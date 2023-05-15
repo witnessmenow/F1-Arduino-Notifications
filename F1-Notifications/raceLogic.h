@@ -14,6 +14,24 @@ void raceLogicSetup(F1Config f1Config) {
   rl_f1Config = f1Config;
 }
 
+bool isSessionInFuture(const char* sessionStartTime) {
+  struct tm tm = {0};
+  // Parse date from UTC and convert to an epoch
+  strptime(sessionStartTime, "%Y-%m-%dT%H:%M:%S", &tm);
+  time_t sessionEpoch = mktime(&tm);
+
+  return UTC.now() < sessionEpoch;
+}
+
+bool isRaceWeek(const char* sessionStartTime) {
+  struct tm tm = {0};
+  // Parse date from UTC and convert to an epoch
+  strptime(sessionStartTime, "%Y-%m-%dT%H:%M:%S", &tm);
+
+  time_t sixDaysBeforeRaceEpoch = mktime(&tm) - (5 * SECS_PER_DAY);
+  return UTC.now() > sixDaysBeforeRaceEpoch;
+}
+
 String getConvertedTime(const char* sessionStartTime, const char* timeFormat = "") {
   struct tm tm = {0};
   // Parse date from UTC and convert to an epoch
