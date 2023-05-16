@@ -1,0 +1,80 @@
+name: Test compiling arduino code
+
+on:
+  # Runs on all branches but main, when a arduino file is changed
+  push:
+    branches-ignore : ["main"]
+    paths:
+      - '**.ino'
+      - '**.h'
+      - '**.yml'
+
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Install the Arduino CLI
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+
+      # Install TFT_eSPI
+      - name: Install TFT_eSPI library to prepare for modifications
+        run: |
+          arduino-cli lib install TFT_eSPI
+
+      # Copy user_setup from repo to TFT_eSPI folder
+      - name: Copy User_Setup.h for TFT_eSPI
+        run: |
+          \cp -fR DisplayConfig/User_Setup.h ~/Arduino/libraries/TFT_eSPI/
+
+      # Build CYD Arduino Code
+      - uses: arduino/compile-sketches@v1
+        name: Compile CYD code
+        with: 
+          fqbn: "esp32:esp32:esp32"
+          platforms: |
+            - name: esp32:esp32
+              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          # No need to specify ESP-libraries as these are installed with the platform (on the line above).
+          libraries: | 
+            - name: ImageFetcher
+              source-url: https://github.com/witnessmenow/file-fetcher-arduino.git
+            - name: WiFiManager
+            - name: ESP_DoubleResetDetector 
+            - name: ArduinoJson 
+            - name: ezTime 
+            - name: UniversalTelegramBot
+            - name: PNGdec
+          sketch-paths: |
+            - F1-Notifications
+          enable-warnings-report: true
+          verbose: false
+
+      # Build Matrix Arduino Code
+      - uses: arduino/compile-sketches@v1
+        name: Compile Matrix code
+        with: 
+          fqbn: "esp32:esp32:esp32"
+          platforms: |
+            - name: esp32:esp32
+              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          # No need to specify ESP-libraries as these are installed with the platform (on the line above). 
+          # Downloading SpeedyStepper from source to get correct casing on import of Arduino.h (spelled arduino.h in the version from Arduino Library Manager)
+          libraries: | 
+            - name: ImageFetcher
+              source-url: https://github.com/witnessmenow/file-fetcher-arduino.git
+            - name: ESP32 HUB75 LED MATRIX PANEL DMA Display
+              source-url: https://github.com/witnessmenow/ESP32-HUB75-MatrixPanel-I2S-DMA.git
+            - name: Adafruit GFX Library
+          sketch-paths: |
+            - F1-Notifications
+          enable-warnings-report: true
+          verbose: false
+          cli-compile-flags: |
+            - --build-property 
+            - compiler.cpp.extra_flags=-DMATRIX_DISPLAY

@@ -23,10 +23,6 @@ const int panelResX = 64;      // Number of pixels wide of each INDIVIDUAL panel
 const int panelResY = 64;     // Number of pixels tall of each INDIVIDUAL panel module.
 const int panel_chain = 1;      // Total number of panels chained one to another
 
-//#define ENABLE_DOUBLE_BUFFER 1 // This is a good example to show the difference the
-// double buffer makes, it doesn't flash as much
-// comment this out to test without it
-
 MatrixPanel_I2S_DMA *dma_display = nullptr;
 
 uint16_t myBLACK = dma_display->color565(0, 0, 0);
@@ -55,13 +51,6 @@ class MatrixDisplay: public F1Display {
       // This can be commented out for any smaller displays (but should work fine with it)
       mxconfig.gpio.e = 18;
 
-#ifdef ENABLE_DOUBLE_BUFFER
-      // This is how you enable the double buffer.
-      // Double buffer can help with animation heavy projects
-      mxconfig.double_buff = true;
-#endif
-
-
       // May or may not be needed depending on your matrix
       // Example of what needing it looks like:
       // https://github.com/mrfaptastic/ESP32-HUB75-MatrixPanel-I2S-DMA/issues/134#issuecomment-866367216
@@ -74,74 +63,70 @@ class MatrixDisplay: public F1Display {
       dma_display = new MatrixPanel_I2S_DMA(mxconfig);
       dma_display->begin();
     }
-
-    void printRaceToScreen(const char* raceName, JsonObject races_sessions) {
-
+    void displayRaceWeek(const char* raceName, JsonObject races_sessions) {
 
       const char* raceNameChanged = updateRaceName(raceName);
-      if (isRaceWeek(races_sessions["gp"])) {
-        // It's race week!
-        dma_display->fillScreen(myBLACK);
-        dma_display->setTextSize(1);     // size 2 == 16 pixels high
-        dma_display->setTextWrap(false); // N.B!! Don't wrap at end of line
 
-        int16_t xOne, yOne;
-        uint16_t w, h;
+      // It's race week!
+      dma_display->fillScreen(myBLACK);
+      dma_display->setTextSize(1);     // size 2 == 16 pixels high
+      dma_display->setTextWrap(false); // N.B!! Don't wrap at end of line
 
-        // This method updates the variables with what width (w) and height (h)
-        // the give text will have.
+      int16_t xOne, yOne;
+      uint16_t w, h;
 
-        dma_display->getTextBounds(raceNameChanged, 0, 0, &xOne, &yOne, &w, &h);
+      // This method updates the variables with what width (w) and height (h)
+      // the give text will have.
 
-        int xPosition = screenCenterX - w / 2;
-        dma_display->setTextColor(myBLUE);
-        dma_display->setCursor(xPosition, 2);
-        dma_display->print(raceNameChanged);
+      dma_display->getTextBounds(raceNameChanged, 0, 0, &xOne, &yOne, &w, &h);
 
-        int yValue = 12;
-        for (JsonPair kv : races_sessions) {
-          printSession( yValue,
-                        matrixSessionCodeToString(kv.key().c_str()),
-                        getConvertedTime(kv.value().as<const char*>(), "H:i"));
-          yValue += 10;
-        }
-      } else {
-        // Not yet race week
-        dma_display->fillScreen(myBLACK);
-        dma_display->setTextSize(1);     // size 2 == 16 pixels high
-        dma_display->setTextWrap(false); // N.B!! Don't wrap at end of line
+      int xPosition = screenCenterX - w / 2;
+      dma_display->setTextColor(myBLUE);
+      dma_display->setCursor(xPosition, 2);
+      dma_display->print(raceNameChanged);
 
-        int16_t xOne, yOne;
-        uint16_t w, h;
-
-        // This method updates the variables with what width (w) and height (h)
-        // the give text will have.
-        dma_display->getTextBounds("Next Race:", 0, 0, &xOne, &yOne, &w, &h);
-        int xPosition = screenCenterX - w / 2;
-        dma_display->setTextColor(myGREEN);
-        dma_display->setCursor(xPosition, 2);
-        dma_display->print("Next Race:");
-        
-        
-        
-
-        // This method updates the variables with what width (w) and height (h)
-        // the give text will have.
-
-        dma_display->getTextBounds(raceNameChanged, 0, 0, &xOne, &yOne, &w, &h);
-
-        xPosition = screenCenterX - w / 2;
-        dma_display->setTextColor(myBLUE);
-        dma_display->setCursor(xPosition, 10);
-        dma_display->print(raceNameChanged);
-
-        printSession( 20,
-                      "GP:",
-                        getConvertedTime(races_sessions["gp"], "M d"));
-        
+      int yValue = 12;
+      for (JsonPair kv : races_sessions) {
+        printSession( yValue,
+                      matrixSessionCodeToString(kv.key().c_str()),
+                      getConvertedTime(kv.value().as<const char*>(), "H:i"));
+        yValue += 10;
       }
+    }
 
+    void displayPlaceHolder(const char* raceName, JsonObject races_sessions) {
 
+      const char* raceNameChanged = updateRaceName(raceName);
+
+      // Not yet race week
+      dma_display->fillScreen(myBLACK);
+      dma_display->setTextSize(1);     // size 2 == 16 pixels high
+      dma_display->setTextWrap(false); // N.B!! Don't wrap at end of line
+
+      int16_t xOne, yOne;
+      uint16_t w, h;
+
+      // This method updates the variables with what width (w) and height (h)
+      // the give text will have.
+      dma_display->getTextBounds("Next Race:", 0, 0, &xOne, &yOne, &w, &h);
+      int xPosition = screenCenterX - w / 2;
+      dma_display->setTextColor(myGREEN);
+      dma_display->setCursor(xPosition, 2);
+      dma_display->print("Next Race:");
+
+      // This method updates the variables with what width (w) and height (h)
+      // the give text will have.
+
+      dma_display->getTextBounds(raceNameChanged, 0, 0, &xOne, &yOne, &w, &h);
+
+      xPosition = screenCenterX - w / 2;
+      dma_display->setTextColor(myBLUE);
+      dma_display->setCursor(xPosition, 10);
+      dma_display->print(raceNameChanged);
+
+      printSession( 20,
+                    "GP:",
+                    getConvertedTime(races_sessions["gp"], "M d"));
     }
 
     int displayImage(char *imageFileUri) {
@@ -192,7 +177,7 @@ class MatrixDisplay: public F1Display {
       return "UNKNOWN";
     }
 
-    const char* updateRaceName(const char* sessionCode){
+    const char* updateRaceName(const char* sessionCode) {
       if (strcmp(sessionCode, "Emilia Romagna Grand Prix") == 0)
       {
         return "Monza";

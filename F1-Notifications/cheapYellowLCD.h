@@ -62,7 +62,11 @@ class CheapYellowDisplay: public F1Display {
       tft.fillScreen(TFT_BLACK);
     }
 
-    void printRaceToScreen(const char* raceName, JsonObject races_sessions) {
+    void displayPlaceHolder(const char* raceName, JsonObject races_sessions) {
+      displayRaceWeek(raceName, races_sessions); // For now
+    }
+
+    void displayRaceWeek(const char* raceName, JsonObject races_sessions) {
       Serial.println("prts");
       tft.fillRect(0, 0, screenWidth, screenHeight, TFT_BLACK);
 

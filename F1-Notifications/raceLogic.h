@@ -217,7 +217,12 @@ bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display) {
       } else {
         Serial.println("Same Race as before");
       }
-      f1Display->printRaceToScreen(races_name, races_sessions);
+      if (isRaceWeek(race_sessions_gp) {
+        f1Display->displayRaceWeek(races_name, races_sessions);
+      } else {
+        f1Display->displayPlaceHolder(races_name, races_sessions);
+      }
+      
       printRaceTimes(races_name, races_sessions);
       racesJson.close();
       return newRace;
