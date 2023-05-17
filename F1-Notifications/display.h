@@ -5,18 +5,18 @@
 class F1Display {
   public:
     virtual void displaySetup() = 0;
-    virtual void printRaceToScreen(const char* raceName, JsonObject races_sessions) {
-        Serial.println("Base Display Class - Print Race to Screen");
-      };
-    virtual int displayImage(char *imageFileUri) = 0;
+
+    // For when its more than a week before race day
+    virtual void displayPlaceHolder(const char* raceName, JsonObject races_sessions) = 0;
+    virtual void displayRaceWeek(const char* raceName, JsonObject races_sessions) = 0;
     virtual void drawWifiManagerMessage(WiFiManager *myWiFiManager) = 0;
 
-    void setWidth(int w){
+    void setWidth(int w) {
       screenWidth = w;
-      screenCenterX = screenWidth /2;
+      screenCenterX = screenWidth / 2;
     }
 
-    void setHeight(int h){
+    void setHeight(int h) {
       screenHeight = h;
     }
 

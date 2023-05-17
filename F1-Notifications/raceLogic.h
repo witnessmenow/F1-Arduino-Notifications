@@ -115,7 +115,6 @@ bool sendNotificationOfNextRace(UniversalTelegramBot *bot, int offset) {
   filter_races_0["name"] = true;
   filter_races_0["location"] = true;
   filter_races_0["round"] = true;
-  filter_races_0["circuitImage"] = true;
   filter_races_0["sessions"] = true;
 
   File racesJson = SPIFFS.open(RACE_FILE_NAME);
@@ -176,8 +175,8 @@ bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display) {
   filter_races_0["name"] = true;
   filter_races_0["location"] = true;
   filter_races_0["round"] = true;
-  filter_races_0["circuitImage"] = true;
   filter_races_0["sessions"] = true;
+  filter_races_0["canceled"] = true;
 
   File racesJson = SPIFFS.open(RACE_FILE_NAME);
   DynamicJsonDocument doc(12288);
@@ -196,9 +195,13 @@ bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display) {
   Serial.println();
   Serial.println("UTC:             " + UTC.dateTime());
   for (int i = offset; i < racesAmount; i++) {
+
+    //serializeJsonPretty(races[i], Serial);
+    
     const char* races_name = races[i]["name"];
     JsonObject races_sessions = races[i]["sessions"];
     const char* race_sessions_gp = races_sessions["gp"]; // "2023-03-05T15:00:00Z"
+    bool raceCanceled = races[i]["canceled"].as<bool>();
 
     struct tm tm = {0};
 
@@ -207,7 +210,7 @@ bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display) {
     strptime(race_sessions_gp, "%Y-%m-%dT%H:%M:%S", &tm);
 
     nextRaceStartUtc = mktime(&tm);
-    if (timeNow < nextRaceStartUtc) {
+    if (!raceCanceled && timeNow < nextRaceStartUtc) {
       bool newRace = false;
       if (i > offset) {
         offset = i;
@@ -217,7 +220,13 @@ bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display) {
       } else {
         Serial.println("Same Race as before");
       }
-      f1Display->printRaceToScreen(races_name, races_sessions);
+
+      if (isRaceWeek(race_sessions_gp)) {
+        f1Display->displayRaceWeek(races_name, races_sessions);
+      } else {
+        f1Display->displayPlaceHolder(races_name, races_sessions);
+      }
+
       printRaceTimes(races_name, races_sessions);
       racesJson.close();
       return newRace;

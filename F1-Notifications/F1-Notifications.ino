@@ -229,10 +229,21 @@ void sendNotification() {
 
 bool first = true;
 
-int minuteCounter = 0;
+int minuteCounter = 60; //kick off fetch first time
 
 void loop() {
   drd->loop();
+
+  if (minuteCounter >= 60) {
+    secured_client.setCACert(github_server_cert);
+    while (fetchRaceJson(fileFetcher) != 1) {
+      Serial.println("failed to get Race Json");
+      Serial.println("will try again in 10 seconds");
+      delay(1000 * 10);
+    }
+    minuteCounter = 0;
+  }
+  
   if (first || minuteChanged()) {
     minuteCounter ++;
     first = false;
@@ -249,14 +260,5 @@ void loop() {
     }
   }
 
-  if (minuteCounter >= 60) {
-    secured_client.setCACert(github_server_cert);
-    while (fetchRaceJson(fileFetcher) != 1) {
-      Serial.println("failed to get Race Json");
-      Serial.println("will try again in 10 seconds");
-      delay(1000 * 10);
-    }
-    minuteCounter = 0;
-  }
   events();
 }
