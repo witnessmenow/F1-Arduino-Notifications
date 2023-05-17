@@ -180,7 +180,7 @@ class MatrixDisplay: public F1Display {
     const char* updateRaceName(const char* sessionCode) {
       if (strcmp(sessionCode, "Emilia Romagna Grand Prix") == 0)
       {
-        return "Monza";
+        return "Imola";
       }
 
       return sessionCode;
