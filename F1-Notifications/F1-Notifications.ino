@@ -103,6 +103,11 @@
 
 #include "wifiManager.h"
 
+
+WiFiClientSecure secured_client;
+
+FileFetcher fileFetcher(secured_client);
+
 // ----------------------------
 // Display Handling Code
 // ----------------------------
@@ -122,13 +127,9 @@ F1Display* f1Display = &matrixDisplay;
 #endif
 // ----------------------------
 
-WiFiClientSecure secured_client;
 UniversalTelegramBot bot("", secured_client);
 
 F1Config f1Config;
-
-
-FileFetcher fileFetcher(secured_client);
 
 void setup() {
   // put your setup code here, to run once:
