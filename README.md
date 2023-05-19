@@ -49,7 +49,7 @@ All the parts can be purchased from Makerfabs.com:
 - [64 x 64 Matrix Panel](https://www.makerfabs.com/64x64-rgb-led-matrix-3mm-pitch.html)
 - Optional: [5V Power Supply](https://www.makerfabs.com/5v-6a-ac-dc-power-adapter-with-cable.html) - You can alternatively use a USB-C power supply
    
- * = Affilate Link
+ \* = Affilate Link
  
 ### BYOD (Bring your own display)
 
