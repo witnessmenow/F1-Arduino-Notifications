@@ -1,4 +1,5 @@
 #include "display.h"
+#include "getImage.h"
 
 #include <TFT_eSPI.h>
 // A library for interfacing with LCD displays
@@ -15,6 +16,7 @@
 // -------------------------------
 // Putting this stuff outside the class because
 // I can't easily pass member functions in as callbacks for pngdec
+
 // -------------------------------
 
 TFT_eSPI tft = TFT_eSPI();
@@ -60,10 +62,38 @@ class CheapYellowDisplay: public F1Display {
       tft.init();
       tft.setRotation(1);
       tft.fillScreen(TFT_BLACK);
+
+      state = unset;
     }
 
     void displayPlaceHolder(const char* raceName, JsonObject races_sessions) {
-      displayRaceWeek(raceName, races_sessions); // For now
+
+      if(!isSameRace(raceName) || state != placeholder){
+        setRaceName(raceName);
+        int imageFileStatus = getImage(raceName);
+        if(imageFileStatus){
+          int imageDisplayStatus = displayImage(TRACK_IMAGE);
+          if(imageDisplayStatus == PNG_SUCCESS){
+            //Image is displayed
+            tft.setTextColor(TFT_WHITE, TFT_BLACK);
+            int yPos = 188;
+            tft.drawCentreString("Next Race", screenCenterX, yPos, 2);
+            yPos += 16;
+            tft.drawCentreString(raceName, screenCenterX, yPos, 2);
+            String tempStr = String(getConvertedTime(races_sessions["gp"], "M d"));
+            yPos += 16;
+            tft.drawCentreString(tempStr, screenCenterX, yPos, 2);
+            state = placeholder;
+            return;
+          }
+        }
+        //Failed to display the image
+        displayRaceWeek(raceName, races_sessions); // For now
+      }
+
+      // if we reach here, the screen doesn't need to be updated
+      Serial.println("No need to update display");
+
     }
 
     void displayRaceWeek(const char* raceName, JsonObject races_sessions) {
@@ -84,6 +114,8 @@ class CheapYellowDisplay: public F1Display {
                       getConvertedTime(kv.value().as<const char*>()));
         yValue += 16;
       }
+
+      state = raceweek;
     }
 
     int displayImage(char *imageFileUri) {
@@ -133,7 +165,6 @@ class CheapYellowDisplay: public F1Display {
     }
 
   private:
-
     void printSession(int x, int y, const char* sessionName, String sessionStartTime) {
       String tempStr = String(sessionName);
       tempStr += " ";

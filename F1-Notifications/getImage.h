@@ -1,4 +1,4 @@
-#include <ImageFetcher.h>
+#include <FileFetcher.h>
 
 // i.imgur.com
 // USERTrust RSA Certification Authority
@@ -43,9 +43,85 @@ jjxDah2nGN59PRbxYvnKkKj9
 // file name for where to save the image.
 #define TRACK_IMAGE "/track.png"
 
-ImageFetcher *imageFetcher;
+const char* getImageUrlForRace(const char* raceName) {
+  if (strcmp(raceName, "Bahrain") == 0)
+  {
+    return "https://i.imgur.com/zUqArqi.png";
+  } else if (strcmp(raceName, "Saudi Arabian") == 0)
+  {
+    return "https://i.imgur.com/vx6MDSF.png";
+  } else if (strcmp(raceName, "Australian") == 0)
+  {
+    return "https://i.imgur.com/ewrhVKU.png";
+  } else if (strcmp(raceName, "Azerbaijan") == 0)
+  {
+    return "https://i.imgur.com/H2C6G2Q.png";
+  } else if (strcmp(raceName, "Miami") == 0)
+  {
+    return "https://i.imgur.com/mwoQzCm.png";
+  } else if (strcmp(raceName, "Emilia Romagna Grand Prix") == 0)
+  {
+    return "https://i.imgur.com/tvLjDeo.png"; // This is a called off image
+  } else if (strcmp(raceName, "Monaco") == 0)
+  {
+    return "https://i.imgur.com/Q48IRF1.png";
+  } else if (strcmp(raceName, "Spanish") == 0)
+  {
+    return "https://i.imgur.com/GdnHo69.png";
+  } else if (strcmp(raceName, "Canadian") == 0)
+  {
+    return "https://i.imgur.com/QNAli6L.png";
+  } else if (strcmp(raceName, "Austrian") == 0)
+  {
+    return "https://i.imgur.com/Xu4I91f.png";
+  } else if (strcmp(raceName, "British") == 0)
+  {
+    return "https://i.imgur.com/R0snf2W.png";
+  } else if (strcmp(raceName, "Hungarian") == 0)
+  {
+    return "https://i.imgur.com/R0snf2W.png";
+  } else if (strcmp(raceName, "Belgian") == 0)
+  {
+    return "https://i.imgur.com/Hr3HUGP.png";
+  } else if (strcmp(raceName, "Dutch") == 0)
+  {
+    return "https://i.imgur.com/fwyHAy5.png";
+  } else if (strcmp(raceName, "Italian") == 0)
+  {
+    return "https://i.imgur.com/KrRzWhh.png";
+  } else if (strcmp(raceName, "Singapore") == 0)
+  {
+    return "https://i.imgur.com/di1xFkV.png";
+  } else if (strcmp(raceName, "Japanese") == 0)
+  {
+    return "https://i.imgur.com/BINBSn3.png";
+  } else if (strcmp(raceName, "Qatar") == 0)
+  {
+    return "https://i.imgur.com/YdpmY5o.png";
+  } else if (strcmp(raceName, "United States") == 0)
+  {
+    return "https://i.imgur.com/NzZNjF6.png";
+  } else if (strcmp(raceName, "Mexican") == 0)
+  {
+    return "https://i.imgur.com/gvUauKO.png";
+  } else if (strcmp(raceName, "Brazilian") == 0)
+  {
+    return "https://i.imgur.com/3g4zz17.png";
+  } else if (strcmp(raceName, "Las Vegas") == 0)
+  {
+    return "https://i.imgur.com/er9A6G8.png";
+  } else if (strcmp(raceName, "Abu Dhabi") == 0)
+  {
+    return "https://i.imgur.com/QDwWXna.png";
+  } 
 
-int getImage(String url){
+  // Image not found
+  return "https://imgur.com/FRXJ4do.png";
+}
+
+int getImage(const char* raceName){
+
+  const char* imageUrl = getImageUrlForRace(raceName);
 
   // In this example I reuse the same filename
   // over and over
@@ -61,9 +137,9 @@ int getImage(String url){
     Serial.println("file open failed");
     return -1;
   }
-  
-  imageFetcher->client->setCACert(FORMULA1_CERTIFICATE_ROOT);
-  bool gotImage = imageFetcher->getImage(url, &f);
+
+  secured_client.setCACert(IMGUR_CERTIFICATE_ROOT);
+  bool gotImage = fileFetcher.getFile((char*)imageUrl, &f);
 
   // Make sure to close the file!
   f.close();
