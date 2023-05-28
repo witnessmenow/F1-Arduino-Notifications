@@ -20,7 +20,7 @@
 // (Uncomment the required #define)
 
 // 1. Cheap yellow display (Using TFT-eSPI library)
-//#define YELLOW_DISPLAY 
+//#define YELLOW_DISPLAY
 
 // 2. Matrix Displays (Like the ESP32 Trinity)
 //#define MATRIX_DISPLAY
@@ -217,7 +217,7 @@ void sendNotification() {
   // Cause it could be set to the image one
   secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT);
   Serial.println("Sending notifcation");
-  f1Config.currentRaceNotification = sendNotificationOfNextRace(&bot, f1Config.roundOffset);
+  f1Config.currentRaceNotification = sendNotificationOfNextRace(&bot);
   if (!f1Config.currentRaceNotification) {
     //Notificaiton failed, raise event again
     Serial.println("Notfication failed");
@@ -235,6 +235,7 @@ int minuteCounter = 60; //kick off fetch first time
 void loop() {
   drd->loop();
 
+  // Every hour we will refresh the Race JSON from Github
   if (minuteCounter >= 60) {
     secured_client.setCACert(github_server_cert);
     while (fetchRaceJson(fileFetcher) != 1) {
@@ -244,11 +245,10 @@ void loop() {
     }
     minuteCounter = 0;
   }
-  
+
   if (first || minuteChanged()) {
     minuteCounter ++;
-    first = false;
-    bool newRace = getNextRace(f1Config.roundOffset, f1Config.currentRaceNotification, f1Display);
+    bool newRace = getNextRace(f1Config.roundOffset, f1Config.currentRaceNotification, f1Display, first);
     if (newRace) {
       f1Config.saveConfigFile();
     }
@@ -259,6 +259,7 @@ void loop() {
       Serial.print("Raised event for: ");
       Serial.println(myTZ.dateTime(getNotifyTime(), UTC_TIME, f1Config.timeFormat));
     }
+    first = false;
   }
 
   events();

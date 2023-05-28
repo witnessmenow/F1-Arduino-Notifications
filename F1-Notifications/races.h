@@ -1,3 +1,6 @@
+// This file is old and not used anymore, it now fetches this file from Github
+// but it can be useful for debugging, so I'll leave it here
+
 R"(
 {
   "races": [
