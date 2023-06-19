@@ -166,6 +166,12 @@ int fetchRaceJson(FileFetcher fileFetcher) {
 }
 
 bool saveCurrentRaceToFile(const JsonObject& raceJson) {
+
+  if(raceJson.isNull()){
+    Serial.println("Race data is null, nothing to save");
+    return false;
+  }
+  
   File currentRaceFile = SPIFFS.open(CURRENT_RACE_FILE_NAME, "w");
   if (!currentRaceFile) {
     Serial.println("failed to open config file for writing");

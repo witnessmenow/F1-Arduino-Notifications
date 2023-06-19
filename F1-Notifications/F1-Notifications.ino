@@ -215,17 +215,27 @@ bool notificaitonEventRaised = false;
 
 void sendNotification() {
   // Cause it could be set to the image one
-  secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT);
-  Serial.println("Sending notifcation");
-  f1Config.currentRaceNotification = sendNotificationOfNextRace(&bot);
-  if (!f1Config.currentRaceNotification) {
-    //Notificaiton failed, raise event again
-    Serial.println("Notfication failed");
-    setEvent( sendNotification, getNotifyTime() );
+  if (f1Config.isTelegramConfigured()) {
+    secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT);
+    Serial.println("Sending notifcation");
+    f1Config.currentRaceNotification = sendNotificationOfNextRace(&bot);
+    if (!f1Config.currentRaceNotification) {
+      //Notificaiton failed, raise event again
+      Serial.println("Notfication failed");
+      setEvent( sendNotification, getNotifyTime() );
+    } else {
+      notificaitonEventRaised = false;
+      f1Config.saveConfigFile();
+    }
   } else {
+
+    Serial.println("Would have sent Notification now, but telegram is not configured");
+    
     notificaitonEventRaised = false;
+    f1Config.currentRaceNotification = true;
     f1Config.saveConfigFile();
   }
+
 }
 
 bool first = true;
