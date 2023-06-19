@@ -26,7 +26,7 @@ class F1Config {
     bool currentRaceNotification = false;
 
     bool isTelegramConfigured(){
-      return (botToken != "") && (chatId != "")
+      return (botToken != "") && (chatId != "");
     }
 
     bool fetchConfigFile() {
