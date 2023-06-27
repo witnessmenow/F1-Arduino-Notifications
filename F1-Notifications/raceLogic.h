@@ -235,7 +235,7 @@ bool getNextRace(int &offset, bool &notificationSent, F1Display* f1Display, bool
       bool newRace = false;
       int roundNumber = races[i]["round"];
       if (roundNumber != offset) {
-        if (saveCurrentRaceToFile(races[i].to<JsonObject>())) {
+        if (saveCurrentRaceToFile(races[i])) {
           offset = roundNumber;
           notificationSent = false;
           Serial.println("New Race");
