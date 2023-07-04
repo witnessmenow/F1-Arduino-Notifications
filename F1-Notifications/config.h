@@ -25,6 +25,10 @@ class F1Config {
 
     bool currentRaceNotification = false;
 
+    bool isTelegramConfigured(){
+      return (botToken != "") && (chatId != "");
+    }
+
     bool fetchConfigFile() {
       if (SPIFFS.exists(F1_CONFIG_JSON)) {
         //file exists, reading and loading
