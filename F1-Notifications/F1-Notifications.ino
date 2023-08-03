@@ -23,7 +23,7 @@
 //#define YELLOW_DISPLAY
 
 // 2. Matrix Displays (Like the ESP32 Trinity)
-#define MATRIX_DISPLAY
+//#define MATRIX_DISPLAY
 
 // If no defines are set, it will default to CYD
 #if !defined(YELLOW_DISPLAY) && !defined(MATRIX_DISPLAY)
