@@ -10,15 +10,15 @@
                     "offset": 57344
                 },
                 {
-                    "path": "esp32.esp32.esp32/F1-Notifications.ino.bin",
+                    "path": "firmware.bin",
                     "offset": 65536
                 },
                 {
-                    "path": "esp32.esp32.esp32/F1-Notifications.ino.bootloader.bin",
+                    "path": "bootloader.bin",
                     "offset": 4096
                 },
                 {
-                    "path": "esp32.esp32.esp32/F1-Notifications.ino.partitions.bin",
+                    "path": "partitions.bin",
                     "offset": 32768
                 }
             ]
