@@ -101,7 +101,7 @@ public:
   void displayPlaceHolder(const char *raceName, JsonObject races_sessions)
   {
 
-    const char *raceNameChanged = updateRaceName(raceName);
+    const char *raceNameChanged = convertRaceName(raceName);
 
     // Not yet race week
     dma_display->fillScreen(myBLACK);
