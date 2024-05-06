@@ -20,6 +20,8 @@
 
 // -------------------------------
 
+#define SESSION_TEXT_SIZE 4
+
 TFT_eSPI tft = TFT_eSPI();
 PNG png;
 
@@ -110,20 +112,20 @@ public:
     Serial.println("prts");
     tft.fillRect(0, 0, screenWidth, screenHeight, TFT_BLACK);
 
-    // It's race week!
-    String tempStr = "Next Race: ";
-    tempStr += String(convertRaceName(raceName));
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    int yPos = 5;
+    String gpStartDateStr = String(getConvertedTime(races_sessions["gp"], "M d"));
+    String displayMessage = String(convertRaceName(raceName)) + " | " + gpStartDateStr;
+    tft.drawCentreString(displayMessage, screenCenterX, yPos, 4);
 
-    tft.drawString(tempStr, 5, 5, 2);
-
-    int yValue = 21;
+    int yValue = 46;
     for (JsonPair kv : races_sessions)
     {
-      printSession(5,
+      printSession(4,
                    yValue,
                    sessionCodeToString(kv.key().c_str()),
                    getConvertedTime(kv.value().as<const char *>()));
-      yValue += 16;
+      yValue += (SESSION_TEXT_SIZE) * 8;
     }
 
     state = raceweek;
@@ -182,6 +184,6 @@ private:
     String tempStr = String(sessionName);
     tempStr += " ";
     tempStr += sessionStartTime;
-    tft.drawString(tempStr, x, y, 2);
+    tft.drawString(tempStr, x, y, SESSION_TEXT_SIZE);
   }
 };
