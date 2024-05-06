@@ -137,21 +137,21 @@ The following libraries need to be installed for this project to work:
 | [UniversalTelegramBot](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot) | Telegram bots for your ESP                 | Yes ("UniversalTelegramBot")    |
 | [FileFetcher](https://github.com/witnessmenow/file-fetcher-arduino)                    | For fetching files/images from the web     | No, download from Github        |
 
-### Cheap Yellow Display Specific libraries
+#### Cheap Yellow Display Specific libraries
 
 | Library Name/Link                              | Purpose                         | Library manager  |
 | ---------------------------------------------- | ------------------------------- | ---------------- |
 | [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI) | For controlling the LCD Display | Yes ("tft_espi") |
 | [PNGdec](https://github.com/bitbank2/PNGdec)   | For decoding png images         | Yes ("PNGdec")   |
 
-### Matrix Panel Specific libraries
+#### Matrix Panel Specific libraries
 
 | Library Name/Link                                                                                 | Purpose                          | Library manager          |
 | ------------------------------------------------------------------------------------------------- | -------------------------------- | ------------------------ |
 | [ESP32-HUB75-MatrixPanel-I2S-DMA](https://github.com/mrfaptastic/ESP32-HUB75-MatrixPanel-I2S-DMA) | For controlling the LED Matrix   | Yes ("ESP32 MATRIX DMA") |
 | [Adafruit GFX library](https://github.com/adafruit/Adafruit-GFX-Library)                          | Dependancy of the Matrix library | Yes ("Adafruit GFX")     |
 
-### Cheap Yellow Display Display Config
+#### Cheap Yellow Display Display Config
 
 The CYD version of the project makes use of [TFT_eSPI library by Bodmer](https://github.com/Bodmer/TFT_eSPI).
 
@@ -160,7 +160,7 @@ TFT_eSPI is configured using a "User_Setup.h" file in the library folder, you wi
 - CYD (CYD with single USB): https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display/blob/main/DisplayConfig/User_Setup.h
 - CYD2USB (CYD with 2 USB): https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display/blob/main/DisplayConfig/CYD2USB/User_Setup.h
 
-### Display Selection
+#### Display Selection
 
 At the top of the `F1-Notifications.ino` file, there is a section labeled "Display Type", follow the instructions there for how to enable the different displays.
 
