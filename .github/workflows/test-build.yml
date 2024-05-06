@@ -3,79 +3,51 @@ name: Test compiling arduino code
 on:
   # Runs on all branches but main, when a arduino file is changed
   push:
-    branches-ignore : ["main"]
+    branches-ignore: ["main"]
     paths:
-      - '**.ino'
-      - '**.h'
-      - '**.yml'
+      - "**.ino"
+      - "**.h"
+      - "**.yml"
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      # Install the Arduino CLI
-      - name: Install Arduino CLI
-        uses: arduino/setup-arduino-cli@v1
-
-      # Install TFT_eSPI
-      - name: Install TFT_eSPI library to prepare for modifications
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v3
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Cache PlatformIO
+        uses: actions/cache@v3
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install PlatformIO
         run: |
-          arduino-cli lib install TFT_eSPI
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
 
-      # Copy user_setup from repo to TFT_eSPI folder
-      - name: Copy User_Setup.h for TFT_eSPI
-        run: |
-          \cp -fR DisplayConfig/User_Setup.h ~/Arduino/libraries/TFT_eSPI/
+      #Build CYD
+      - name: Build CYD
+        run: platformio run -e cyd
 
-      # Build CYD Arduino Code
-      - uses: arduino/compile-sketches@v1
-        name: Compile CYD code
-        continue-on-error: true
-        with: 
-          fqbn: "esp32:esp32:esp32"
-          platforms: |
-            - name: esp32:esp32
-              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-          # No need to specify ESP-libraries as these are installed with the platform (on the line above).
-          libraries: | 
-            - name: ImageFetcher
-              source-url: https://github.com/witnessmenow/file-fetcher-arduino.git
-            - name: WiFiManager
-            - name: ESP_DoubleResetDetector 
-            - name: ArduinoJson 
-            - name: ezTime 
-            - name: UniversalTelegramBot
-            - name: PNGdec
-          sketch-paths: |
-            - F1-Notifications
-          enable-warnings-report: true
-          verbose: false
+      #Build CYD2USB
+      - name: Build CYD2USB
+        run: platformio run -e cyd2usb
 
-      # Build Matrix Arduino Code
-      - uses: arduino/compile-sketches@v1
-        name: Compile Matrix code
-        with: 
-          fqbn: "esp32:esp32:esp32"
-          platforms: |
-            - name: esp32:esp32
-              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-          # No need to specify ESP-libraries as these are installed with the platform (on the line above). 
-          # Downloading SpeedyStepper from source to get correct casing on import of Arduino.h (spelled arduino.h in the version from Arduino Library Manager)
-          libraries: | 
-            - name: ImageFetcher
-              source-url: https://github.com/witnessmenow/file-fetcher-arduino.git
-            - name: ESP32 HUB75 LED MATRIX PANEL DMA Display
-              source-url: https://github.com/witnessmenow/ESP32-HUB75-MatrixPanel-I2S-DMA.git
-            - name: Adafruit GFX Library
-          sketch-paths: |
-            - F1-Notifications
-          enable-warnings-report: true
-          verbose: false
-          cli-compile-flags: |
-            - --build-property 
-            - compiler.cpp.extra_flags=-DMATRIX_DISPLAY
+      #Build Matrix
+      - name: Build Matrix
+        run: platformio run -e trinity
