@@ -84,7 +84,7 @@ const char *sessionCodeToString(const char *sessionCode)
   }
   else if (strcmp(sessionCode, "sprintQualifying") == 0)
   {
-    return "Sprint Qualifying: ";
+    return "Sprint Quali: ";
   }
   else if (strcmp(sessionCode, "gp") == 0)
   {

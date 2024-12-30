@@ -11,7 +11,7 @@ class F1Config
 {
 public:
   // How the time will be displayed, see here for more info: https://github.com/ropg/ezTime#datetime
-  String timeFormat = "l, H:i";      // Friday, 00:30
+  String timeFormat = "D, H:i";      // Fri, 00:30
   String timeZone = "Europe/London"; // seems to be something wrong with Europe/Dublin
 
   // Telegram BOT Token (Get from Botfather)
