@@ -4,7 +4,10 @@
 #define RACE_FILE_NAME "/races.json"
 #define CURRENT_RACE_FILE_NAME "/current_races.json"
 
+// path to the races schedule, needs to be updated each year
 #define RACE_JSON_URL "https://raw.githubusercontent.com/sportstimes/f1/main/_db/f1/2025.json"
+// Number of days before the race to display circuit image rather than sessions schedule
+#define DaysBeforeRace 3
 
 time_t nextRaceStartUtc;
 
@@ -32,8 +35,8 @@ bool isRaceWeek(const char *sessionStartTime)
   // Parse date from UTC and convert to an epoch
   strptime(sessionStartTime, "%Y-%m-%dT%H:%M:%S", &tm);
 
-  time_t sixDaysBeforeRaceEpoch = mktime(&tm) - (3 * SECS_PER_DAY);
-  return UTC.now() > sixDaysBeforeRaceEpoch;
+  time_t DaysBeforeRaceEpoch = mktime(&tm) - (DaysBeforeRace * SECS_PER_DAY); 
+  return UTC.now() > DaysBeforeRaceEpoch;
 }
 
 String getConvertedTime(const char *sessionStartTime, const char *timeFormat = "")
