@@ -137,6 +137,10 @@ const char *getImageUrlForRace(const char *raceName)
   {
     return "https://i.imgur.com/QDwWXna.png";
   }
+    else if (strcmp(raceName, "Chinese") == 0)
+  {
+    return "https://i.imgur.com/dpoPdoD.png";
+  }
 
   // Image not found
   return "https://i.imgur.com/FRXJ4do.png";
