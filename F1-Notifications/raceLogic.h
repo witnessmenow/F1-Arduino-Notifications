@@ -5,7 +5,7 @@
 #define CURRENT_RACE_FILE_NAME "/current_races.json"
 
 // path to the races schedule, needs to be updated each year
-#define RACE_JSON_URL "https://raw.githubusercontent.com/sportstimes/f1/main/_db/f1/2025.json"
+#define RACE_JSON_URL "https://raw.githubusercontent.com/sportstimes/f1/main/_db/f1/2026.json"
 // Number of days before the race to display circuit image rather than sessions schedule
 #define DaysBeforeRace 3
 
