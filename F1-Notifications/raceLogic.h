@@ -4,8 +4,6 @@
 #define RACE_FILE_NAME "/races.json"
 #define CURRENT_RACE_FILE_NAME "/current_races.json"
 
-// path to the races schedule, needs to be updated each year
-#define RACE_JSON_URL "https://raw.githubusercontent.com/sportstimes/f1/main/_db/f1/2025.json"
 // Number of days before the race to display circuit image rather than sessions schedule
 #define DaysBeforeRace 3
 
@@ -159,6 +157,28 @@ bool sendNotificationOfNextRace(UniversalTelegramBot *bot)
   return bot->sendPhoto(rl_f1Config.chatId, "https://i.imgur.com/q3qsfSi.png", createTelegramMessageString(races_name, races_sessions));
 }
 
+// Dynamically build the URL to fetch races calendar based on the current year, so we don't have to update the code every year
+
+int getCurrentYear()
+{
+  time_t now = UTC.now();
+  struct tm *t = gmtime(&now);
+  return 1900 + t->tm_year;
+}
+
+void buildRaceJsonUrl(char *buffer, size_t bufferSize)
+{
+  int year = getCurrentYear();
+
+  String url = "https://raw.githubusercontent.com/sportstimes/f1/main/_db/f1/";
+  url += String(year);
+  url += ".json";
+
+  url.toCharArray(buffer, bufferSize);
+}
+
+// -------------------------------------------------------
+
 int fetchRaceJson(FileFetcher fileFetcher)
 {
   // In this example I reuse the same filename
@@ -176,7 +196,11 @@ int fetchRaceJson(FileFetcher fileFetcher)
     return -1;
   }
 
-  bool gotFile = fileFetcher.getFile(RACE_JSON_URL, &f);
+  // Use of dynamic URL based on current year
+  char urlBuf[128];
+  buildRaceJsonUrl(urlBuf, sizeof(urlBuf));
+
+  bool gotFile = fileFetcher.getFile(urlBuf, &f);
 
   // Make sure to close the file!
   f.close();
