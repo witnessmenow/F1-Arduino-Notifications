@@ -75,7 +75,7 @@ const char *getImageUrlForRace(const char *raceName)
   }
   else if (strcmp(raceName, "Spanish") == 0)
   {
-    return "https://i.imgur.com/GdnHo69.png";
+    return "https://i.imgur.com/gvjLsiK.png";
   }
   else if (strcmp(raceName, "Canadian") == 0)
   {
@@ -141,7 +141,11 @@ const char *getImageUrlForRace(const char *raceName)
   {
     return "https://i.imgur.com/dpoPdoD.png";
   }
-
+    else if (strcmp(raceName, "Barcelona-Catalunya") == 0)
+  {
+    return "https://i.imgur.com/GdnHo69.png";
+  }
+  
   // Image not found
   return "https://i.imgur.com/FRXJ4do.png";
   //"https://i.imgur.com/tvLjDeo.png"; // This is a called off image
