@@ -27,29 +27,31 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/cache@v3
       - name: Cache pip
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Cache PlatformIO
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.platformio
-          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+          key: ${{ runner.os }}-platformio-${{ hashFiles('platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-platformio-
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.11"
       - name: Install PlatformIO
         run: |
           python -m pip install --upgrade pip
-          pip install --upgrade platformio
+          pip install platformio==6.1.18
 
       #Build CYD
       - name: Build CYD
@@ -62,7 +64,7 @@ jobs:
           if-no-files-found: error
       - name: Copy compiled binaries for webflash
         run: |
-          mkdir GitHubPages/ESPWebTools/cyd
+          mkdir -p GitHubPages/ESPWebTools/cyd
 
           # Copy the manifest file for the CYD
           cp GitHubPages/ESPWebTools/manifest.json GitHubPages/ESPWebTools/cyd
@@ -83,14 +85,14 @@ jobs:
           if-no-files-found: error
       - name: Copy compiled binaries for webflash
         run: |
-          mkdir GitHubPages/ESPWebTools/cyd2usb
+          mkdir -p GitHubPages/ESPWebTools/cyd2usb
 
           # Copy the manifest file for the cyd2usb
           cp GitHubPages/ESPWebTools/manifest.json GitHubPages/ESPWebTools/cyd2usb
 
           cp .pio/build/cyd2usb/bootloader.bin GitHubPages/ESPWebTools/cyd2usb
           cp .pio/build/cyd2usb/partitions.bin GitHubPages/ESPWebTools/cyd2usb
-          cp /home/runner/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin GitHubPages/ESPWebTools/cyd
+          cp /home/runner/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin GitHubPages/ESPWebTools/cyd2usb
           cp .pio/build/cyd2usb/firmware.bin GitHubPages/ESPWebTools/cyd2usb
 
       #Build Matrix
@@ -104,7 +106,7 @@ jobs:
           if-no-files-found: error
       - name: Copy compiled binaries for webflash
         run: |
-          mkdir GitHubPages/ESPWebTools/matrix
+          mkdir -p GitHubPages/ESPWebTools/matrix
 
           # Copy the manifest file for the Matrix
           cp GitHubPages/ESPWebTools/manifest.json GitHubPages/ESPWebTools/matrix
@@ -117,6 +119,13 @@ jobs:
       # Build GitHub Page
       - name: Setup Github Page
         uses: actions/configure-pages@v4
+
+      - name: Inject build metadata into web page
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          COMMIT_URL="https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          sed -i "s|__BUILD_COMMIT__|${SHORT_SHA}|g" GitHubPages/index.html
+          sed -i "s|__BUILD_COMMIT_URL__|${COMMIT_URL}|g" GitHubPages/index.html
 
       - name: Build GitHub Page with Jekyll
         uses: actions/jekyll-build-pages@v1
@@ -133,6 +142,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: build
     steps:
       - name: Deploy to GitHub Pages
