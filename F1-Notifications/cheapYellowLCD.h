@@ -131,14 +131,14 @@ public:
     state = raceweek;
   }
 
-  int displayImage(char *imageFileUri)
+  int displayImage(const char *imageFileUri)
   {
     tft.fillScreen(TFT_BLACK);
     unsigned long lTime = millis();
     lTime = millis();
     Serial.println(imageFileUri);
 
-    int rc = png.open((const char *)imageFileUri, myOpen, myClose, myRead, mySeek, PNGDraw);
+    int rc = png.open(imageFileUri, myOpen, myClose, myRead, mySeek, PNGDraw);
     if (rc == PNG_SUCCESS)
     {
       Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
