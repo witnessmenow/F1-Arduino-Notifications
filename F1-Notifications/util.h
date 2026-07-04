@@ -5,6 +5,10 @@ const char *convertRaceName(const char *raceName)
     {
         return "Imola";
     }
+    else if (strcmp(raceName, "Barcelona-Catalunya") == 0)
+    {
+        return "Barcelona";
+    }
     else
     {
         return raceName;

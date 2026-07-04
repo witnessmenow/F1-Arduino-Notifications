@@ -186,6 +186,12 @@ void setup()
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
+  // Sync time before fetching Race Json so we can determine the current year
+  Serial.println("Waiting for time sync");
+  waitForSync();
+  Serial.println();
+  Serial.println("UTC:             " + UTC.dateTime());
+
   secured_client.setCACert(github_server_cert);
   while (fetchRaceJson(fileFetcher) != 1)
   {
@@ -195,13 +201,6 @@ void setup()
   }
 
   Serial.println("Fetched races.json File");
-
-  Serial.println("Waiting for time sync");
-
-  waitForSync();
-
-  Serial.println();
-  Serial.println("UTC:             " + UTC.dateTime());
 
   myTZ.setLocation(f1Config.timeZone);
   Serial.print(f1Config.timeZone);
